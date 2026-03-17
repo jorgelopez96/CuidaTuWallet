@@ -1,0 +1,54 @@
+/* src/index.css */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply scroll-smooth;
+  }
+
+  html.dark body {
+    @apply text-white;
+    background: transparent;
+  }
+
+  html:not(.dark) body {
+    @apply text-slate-900;
+    background: transparent;
+  }
+
+  body {
+    @apply transition-colors duration-300 font-sans;
+  }
+
+  html.dark option {
+    background-color: #1e1b4b;
+    color: white;
+  }
+
+  html:not(.dark) option {
+    background-color: white;
+    color: #0f172a;
+  }
+}
+
+/* Page transition */
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.page-transition {
+  animation: fadeSlideIn 0.25s ease-out both;
+}
+
+.fade-in {
+  animation: fadeIn 0.2s ease-out both;
+}
