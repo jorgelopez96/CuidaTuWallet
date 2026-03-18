@@ -11,6 +11,7 @@ import Input from '../components/ui/Input'
 import Skeleton from '../components/ui/Skeleton'
 import EmptyState from '../components/ui/EmptyState'
 import PageWrapper from '../components/ui/PageWrapper'
+import CloseButton from '../components/ui/CloseButton'
 import { formatCurrency } from '../utils/formatCurrency'
 
 const EMPTY_EXPENSE_FORM = {
@@ -170,8 +171,7 @@ const CardDetailPage = () => {
                   <div className="flex flex-col items-end gap-1 ml-4 shrink-0">
                     <p className="text-violet-500 font-bold">{formatCurrency(expense.currentInstallmentAmount)}<span className="text-xs font-normal dark:text-slate-400 text-slate-500">/mes</span></p>
                     <p className="text-xs dark:text-slate-500 text-slate-400">{formatCurrency(expense.totalAmount)} total</p>
-                    <button onClick={() => setConfirmId(expense.id)}
-                      className="text-xs dark:text-slate-500 text-slate-400 hover:text-red-500 transition-colors mt-1">✕ Eliminar</button>
+                    <CloseButton onClick={() => setConfirmId(expense.id)} label="Eliminar gasto" size="sm" />
                   </div>
                 </div>
               </Card>

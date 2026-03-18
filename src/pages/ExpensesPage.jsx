@@ -11,6 +11,7 @@ import Select from '../components/ui/Select'
 import Skeleton from '../components/ui/Skeleton'
 import EmptyState from '../components/ui/EmptyState'
 import PageWrapper from '../components/ui/PageWrapper'
+import CloseButton from '../components/ui/CloseButton'
 import { formatCurrency } from '../utils/formatCurrency'
 import { EXPENSE_CATEGORIES } from '../config/constants'
 
@@ -134,10 +135,9 @@ const ExpensesPage = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2">
                     <span className="text-red-500 font-bold text-sm">{formatCurrency(expense.amount)}</span>
-                    <button onClick={() => setConfirmId(expense.id)}
-                      className="dark:text-slate-500 text-slate-400 hover:text-red-500 transition-colors text-sm" aria-label="Eliminar">✕</button>
+                    <CloseButton onClick={() => setConfirmId(expense.id)} label="Eliminar gasto" />
                   </div>
                 </Card>
               )

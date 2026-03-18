@@ -11,6 +11,7 @@ import Select from '../components/ui/Select'
 import Skeleton from '../components/ui/Skeleton'
 import EmptyState from '../components/ui/EmptyState'
 import PageWrapper from '../components/ui/PageWrapper'
+import CloseButton from '../components/ui/CloseButton'
 import { formatCurrency } from '../utils/formatCurrency'
 
 const EMPTY_FORM = {
@@ -107,10 +108,9 @@ const IncomesPage = () => {
                       {income.month}{income.type === 'salary' && income.payDay && ` · Cobro día ${income.payDay}`}{income.type === 'salary' && income.expiresMonth && ` · Vence ${income.expiresMonth}`}
                     </p>
                   </div>
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
                     <span className="text-emerald-500 font-bold">{formatCurrency(income.amount)}</span>
-                    <button onClick={() => setConfirmId(income.id)}
-                      className="dark:text-slate-500 text-slate-400 hover:text-red-500 transition-colors" aria-label="Eliminar">✕</button>
+                    <CloseButton onClick={() => setConfirmId(income.id)} label="Eliminar ingreso" />
                   </div>
                 </Card>
               ))}

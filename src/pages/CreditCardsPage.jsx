@@ -12,6 +12,7 @@ import Select from '../components/ui/Select'
 import Skeleton from '../components/ui/Skeleton'
 import EmptyState from '../components/ui/EmptyState'
 import PageWrapper from '../components/ui/PageWrapper'
+import CloseButton from '../components/ui/CloseButton'
 import { formatCurrency } from '../utils/formatCurrency'
 import { CARD_TYPES } from '../config/constants'
 
@@ -99,10 +100,10 @@ const CreditCardsPage = () => {
                           <p className="text-xs dark:text-slate-400 text-slate-500">{card.type}</p>
                           <p className="dark:text-white text-slate-900 font-bold text-xl mt-0.5">{card.alias}</p>
                         </div>
-                        <button
+                        <CloseButton
                           onClick={(e) => { e.stopPropagation(); setConfirmId(card.id) }}
-                          className="dark:text-slate-500 text-slate-400 hover:text-red-500 transition-colors p-1" aria-label="Eliminar tarjeta"
-                        >✕</button>
+                          label="Eliminar tarjeta"
+                        />
                       </div>
                       <p className="dark:text-slate-400 text-slate-500 text-sm tracking-widest mb-4">•••• •••• •••• {card.lastFour}</p>
                       <div className="flex items-end justify-between">
