@@ -13,16 +13,33 @@ export const useUser = () => {
   const { user } = useAuth()
   const { addToast } = useToast()
 
+  // useCallback para que fetchProfile no cambie de referencia en cada render
   const fetchProfile = useCallback(async () => {
     if (!user) return
     context.dispatch({ type: 'FETCH_START' })
     try {
       const profile = await getUserProfile(user.uid)
-      context.dispatch({ type: 'FETCH_SUCCESS', payload: profile })
+      // Si no existe el perfil en Firestore (cuenta vieja), creamos uno mínimo
+      if (!profile) {
+        const fallback = {
+          name: user.email?.split('@')[0] || 'Usuario',
+          email: user.email || '',
+          birthdate: '',
+        }
+        context.dispatch({ type: 'FETCH_SUCCESS', payload: fallback })
+      } else {
+        context.dispatch({ type: 'FETCH_SUCCESS', payload: profile })
+      }
     } catch {
-      context.dispatch({ type: 'FETCH_ERROR', payload: 'Error al cargar perfil' })
+      // En caso de error, usar datos mínimos del auth para no romper la UI
+      const fallback = {
+        name: user.email?.split('@')[0] || 'Usuario',
+        email: user.email || '',
+        birthdate: '',
+      }
+      context.dispatch({ type: 'FETCH_SUCCESS', payload: fallback })
     }
-  }, [user])
+  }, [user?.uid])
 
   const updateProfile = async (data) => {
     if (!user) return { success: false }

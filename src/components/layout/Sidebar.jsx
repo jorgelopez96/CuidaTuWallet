@@ -1,6 +1,7 @@
 // src/components/layout/Sidebar.jsx
 
 import { NavLink, useNavigate } from 'react-router-dom'
+import { useEffect } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { useUser } from '../../hooks/useUser'
 import ThemeToggle from '../ui/ThemeToggle'
@@ -31,7 +32,10 @@ export const NavItems = ({ onItemClick }) => {
   const { initials, displayName, profile, fetchProfile } = useUser()
   const navigate = useNavigate()
 
-  if (!profile) fetchProfile()
+  // Fix: useEffect con dependencia vacía — solo carga el perfil una vez al montar
+  useEffect(() => {
+    if (!profile) fetchProfile()
+  }, [])
 
   const handleLogout = async () => {
     await logout()
@@ -40,13 +44,11 @@ export const NavItems = ({ onItemClick }) => {
 
   return (
     <>
-      {/* Logo */}
       <div className="flex items-center gap-3 px-2 mb-8">
         <img src={logo} alt="CuidaTuWallet logo" className="w-9 h-9 rounded-xl object-cover shrink-0" />
         <span className="dark:text-white text-slate-800 font-bold text-lg tracking-tight">CuidaTuWallet</span>
       </div>
 
-      {/* Nav */}
       <nav className="flex flex-col gap-1 flex-1" aria-label="Navegación principal">
         {NAV_ITEMS.map((item) => (
           <NavLink
@@ -67,7 +69,6 @@ export const NavItems = ({ onItemClick }) => {
         ))}
       </nav>
 
-      {/* Bottom */}
       <div className="border-t dark:border-white/10 border-slate-200 pt-4 mt-4 flex flex-col gap-3">
         <div className="flex items-center justify-between px-2">
           <span className="text-xs dark:text-slate-400 text-slate-500">Tema</span>
