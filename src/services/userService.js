@@ -17,9 +17,23 @@ export const getUserProfile = async (uid) => {
 }
 
 export const updateUserProfile = async (uid, data) => {
-  await updateDoc(doc(db, COLLECTIONS.USERS, uid), {
-    ...data,
-    updatedAt: new Date().toISOString(),
-  })
+  const ref = doc(db, COLLECTIONS.USERS, uid)
+  const snap = await getDoc(ref)
+
+  if (snap.exists()) {
+    // Documento existe — actualizar
+    await updateDoc(ref, {
+      ...data,
+      updatedAt: new Date().toISOString(),
+    })
+  } else {
+    // Documento no existe (cuenta vieja sin perfil) — crear
+    await setDoc(ref, {
+      ...data,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    })
+  }
+
   return data
 }

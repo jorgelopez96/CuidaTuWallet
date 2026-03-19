@@ -6,6 +6,7 @@ import { useAuth } from '../../hooks/useAuth'
 import { useUser } from '../../hooks/useUser'
 import ThemeToggle from '../ui/ThemeToggle'
 import Avatar from '../ui/Avatar'
+import NavTooltip from '../ui/NavTooltip'
 import logo from '../../assets/logo.png'
 
 const NAV_ITEMS = [
@@ -32,7 +33,6 @@ export const NavItems = ({ onItemClick }) => {
   const { initials, displayName, profile, fetchProfile } = useUser()
   const navigate = useNavigate()
 
-  // Fix: useEffect con dependencia vacía — solo carga el perfil una vez al montar
   useEffect(() => {
     if (!profile) fetchProfile()
   }, [])
@@ -44,31 +44,35 @@ export const NavItems = ({ onItemClick }) => {
 
   return (
     <>
+      {/* Logo */}
       <div className="flex items-center gap-3 px-2 mb-8">
         <img src={logo} alt="CuidaTuWallet logo" className="w-9 h-9 rounded-xl object-cover shrink-0" />
         <span className="dark:text-white text-slate-800 font-bold text-lg tracking-tight">CuidaTuWallet</span>
       </div>
 
-      <nav className="flex flex-col gap-1 flex-1" aria-label="Navegación principal">
+      {/* Nav con tooltips */}
+      <nav className="flex flex-col gap-1 flex-1 overflow-visible" aria-label="Navegación principal">
         {NAV_ITEMS.map((item) => (
-          <NavLink
-            key={item.to}
-            to={item.to}
-            onClick={onItemClick}
-            className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
-              ${isActive
-                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20'
-                : 'dark:text-slate-400 text-slate-500 dark:hover:text-white hover:text-slate-900 dark:hover:bg-white/5 hover:bg-slate-100'
-              }`
-            }
-          >
-            {item.icon}
-            {item.label}
-          </NavLink>
+          <NavTooltip key={item.to} route={item.to}>
+            <NavLink
+              to={item.to}
+              onClick={onItemClick}
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
+                ${isActive
+                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20'
+                  : 'dark:text-slate-400 text-slate-500 dark:hover:text-white hover:text-slate-900 dark:hover:bg-white/5 hover:bg-slate-100'
+                }`
+              }
+            >
+              {item.icon}
+              {item.label}
+            </NavLink>
+          </NavTooltip>
         ))}
       </nav>
 
+      {/* Bottom section */}
       <div className="border-t dark:border-white/10 border-slate-200 pt-4 mt-4 flex flex-col gap-3">
         <div className="flex items-center justify-between px-2">
           <span className="text-xs dark:text-slate-400 text-slate-500">Tema</span>
@@ -103,7 +107,7 @@ export const NavItems = ({ onItemClick }) => {
 }
 
 const Sidebar = () => (
-  <aside className="hidden md:flex flex-col w-64 min-h-screen dark:bg-[#13102b] bg-white border-r dark:border-white/10 border-slate-200 px-4 py-6 shrink-0 transition-colors duration-300">
+  <aside className="hidden md:flex flex-col w-64 min-h-screen dark:bg-[#13102b] bg-white border-r dark:border-white/10 border-slate-200 px-4 py-6 shrink-0 transition-colors duration-300 overflow-visible">
     <NavItems />
   </aside>
 )
