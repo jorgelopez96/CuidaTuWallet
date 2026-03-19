@@ -5,6 +5,7 @@ import Sidebar from './Sidebar'
 import MobileHeader from './MobileHeader'
 import Toast from '../ui/Toast'
 import AppBackground from '../ui/AppBackground'
+import OnboardingTips from '../ui/OnboardingTips'
 
 const AppLayout = () => (
   <div className="flex min-h-screen dark:bg-transparent bg-transparent dark:text-white text-slate-900 relative">
@@ -17,6 +18,7 @@ const AppLayout = () => (
       </main>
     </div>
     <Toast />
+    <OnboardingTips />
   </div>
 )
 

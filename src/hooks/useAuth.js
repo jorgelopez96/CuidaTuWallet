@@ -22,8 +22,8 @@ export const useAuth = () => {
     } catch (error) {
       const message = getAuthErrorMessage(error.code)
       context.dispatch({ type: 'SET_ERROR', payload: message })
-      addToast(message, 'error')
-      return { success: false }
+      // No mostramos toast en login — la página ya muestra el error inline
+      return { success: false, message }
     }
   }
 
@@ -39,7 +39,7 @@ export const useAuth = () => {
       const message = getAuthErrorMessage(error.code)
       context.dispatch({ type: 'SET_ERROR', payload: message })
       addToast(message, 'error')
-      return { success: false }
+      return { success: false, message }
     }
   }
 
@@ -59,12 +59,14 @@ export const useAuth = () => {
 const getAuthErrorMessage = (code) => {
   const messages = {
     'auth/user-not-found': 'No existe una cuenta con ese email',
-    'auth/wrong-password': 'Contraseña incorrecta',
+    'auth/wrong-password': 'La contraseña es incorrecta',
     'auth/email-already-in-use': 'Ya existe una cuenta con ese email',
     'auth/weak-password': 'La contraseña debe tener al menos 6 caracteres',
     'auth/invalid-email': 'El email no es válido',
-    'auth/invalid-credential': 'Credenciales incorrectas',
+    'auth/invalid-credential': 'Email o contraseña incorrectos',
     'auth/too-many-requests': 'Demasiados intentos. Intentá más tarde',
+    'auth/network-request-failed': 'Error de conexión. Verificá tu internet',
+    'auth/user-disabled': 'Esta cuenta fue deshabilitada',
   }
-  return messages[code] || 'Ocurrió un error inesperado'
+  return messages[code] || 'Ocurrió un error inesperado. Intentá de nuevo'
 }
