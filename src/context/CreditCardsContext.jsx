@@ -31,7 +31,12 @@ const creditCardsReducer = (state, action) => {
         ),
       }
     case 'DELETE_CARD':
-      return { ...state, cards: state.cards.filter((c) => c.id !== action.payload) }
+      return {
+        ...state,
+        cards: state.cards.filter((c) => c.id !== action.payload),
+        // También eliminar del estado todos los gastos de esa tarjeta
+        cardExpenses: state.cardExpenses.filter((e) => e.cardId !== action.payload),
+      }
     case 'ADD_CARD_EXPENSE':
       return { ...state, cardExpenses: [...state.cardExpenses, action.payload] }
     case 'UPDATE_CARD_EXPENSE':

@@ -1,6 +1,6 @@
 // src/components/layout/Sidebar.jsx
 
-import { NavLink, useNavigate } from 'react-router-dom'
+import { NavLink, Link, useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { useUser } from '../../hooks/useUser'
@@ -44,11 +44,15 @@ export const NavItems = ({ onItemClick }) => {
 
   return (
     <>
-      {/* Logo */}
-      <div className="flex items-center gap-3 px-2 mb-8">
+      {/* Logo — clickeable al dashboard */}
+      <Link
+        to="/dashboard"
+        onClick={onItemClick}
+        className="flex items-center gap-3 px-2 mb-8 hover:opacity-80 transition-opacity"
+      >
         <img src={logo} alt="CuidaTuWallet logo" className="w-9 h-9 rounded-xl object-cover shrink-0" />
         <span className="dark:text-white text-slate-800 font-bold text-lg tracking-tight">CuidaTuWallet</span>
-      </div>
+      </Link>
 
       {/* Nav con tooltips */}
       <nav className="flex flex-col gap-1 flex-1 overflow-visible" aria-label="Navegación principal">

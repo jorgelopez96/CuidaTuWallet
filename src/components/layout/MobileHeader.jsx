@@ -1,6 +1,7 @@
 // src/components/layout/MobileHeader.jsx
 
 import { useState, useEffect, useRef } from 'react'
+import { Link } from 'react-router-dom'
 import { NavItems } from './Sidebar'
 import logo from '../../assets/logo.png'
 
@@ -25,10 +26,12 @@ const MobileHeader = () => {
   return (
     <div className="md:hidden">
       <header className="flex items-center justify-between px-4 py-3 dark:bg-[#13102b] bg-white border-b dark:border-white/10 border-slate-200 sticky top-0 z-40 transition-colors duration-300">
-        <div className="flex items-center gap-2">
+        {/* Logo clickeable */}
+        <Link to="/dashboard" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
           <img src={logo} alt="CuidaTuWallet" className="w-7 h-7 rounded-lg object-cover" />
           <span className="dark:text-white text-slate-800 font-bold text-base">CuidaTuWallet</span>
-        </div>
+        </Link>
+
         <button
           onClick={() => setIsOpen(true)}
           className="p-2 rounded-xl dark:text-slate-400 text-slate-500 dark:hover:text-white hover:text-slate-900 dark:hover:bg-white/10 hover:bg-slate-100 transition-all"
@@ -44,7 +47,7 @@ const MobileHeader = () => {
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50">
           <div
             ref={drawerRef}
-            className="absolute top-0 left-0 w-72 h-full dark:bg-[#13102b] bg-white border-r dark:border-white/10 border-slate-200 px-4 py-6 flex flex-col shadow-2xl"
+            className="absolute top-0 left-0 w-72 h-full dark:bg-[#13102b] bg-white border-r dark:border-white/10 border-slate-200 px-4 py-6 flex flex-col shadow-2xl overflow-visible"
             style={{ animation: 'slideInLeft 0.25s ease-out' }}
           >
             <button

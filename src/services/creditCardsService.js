@@ -2,7 +2,7 @@
 
 import { db } from '../config/firebase'
 import {
-  collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, where,
+  collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, where, writeBatch,
 } from 'firebase/firestore'
 import { COLLECTIONS } from '../config/constants'
 
@@ -22,8 +22,22 @@ export const updateCardData = async (id, data) => {
   return { id, ...data }
 }
 
+// Elimina la tarjeta Y todos sus gastos en una sola operación batch
 export const deleteCard = async (id) => {
-  await deleteDoc(doc(db, COLLECTIONS.CREDIT_CARDS, id))
+  const batch = writeBatch(db)
+
+  // Eliminar la tarjeta
+  batch.delete(doc(db, COLLECTIONS.CREDIT_CARDS, id))
+
+  // Buscar y eliminar todos los gastos de esa tarjeta
+  const expensesQuery = query(
+    collection(db, COLLECTIONS.CARD_EXPENSES),
+    where('cardId', '==', id)
+  )
+  const expensesSnapshot = await getDocs(expensesQuery)
+  expensesSnapshot.docs.forEach((d) => batch.delete(d.ref))
+
+  await batch.commit()
   return id
 }
 
