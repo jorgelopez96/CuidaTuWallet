@@ -47,12 +47,12 @@ VITE_SUPABASE_URL=https://ybnorjqqmrgqfctkstiw.supabase.co
 VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_rGV4mWdY47sWBs54Ov57Hg_16KeSUzW
 ```
 
-## 6. Pendiente — variables en Vercel
+## 6. Variables en Vercel
 
-**Esto no se hizo automáticamente.** Falta que Jorge agregue las 3 variables
-nuevas en **Vercel → Project Settings → Environment Variables** (Production,
-Preview, Development). No hace falta redeploy todavía — recién importa cuando
-el código que las usa esté mergeado a `main`.
+Hecho — las 3 variables nuevas están agregadas en el proyecto `cuida-tu-wallet`
+(All Environments: Production, Preview, Development). No sensibles (son claves
+públicas por diseño). No se hizo redeploy — el código en `main` todavía no las
+usa, recién importa cuando esta rama se mergee.
 
 ## Nota para producción (Etapa 6 o antes de lanzar)
 
