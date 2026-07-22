@@ -50,7 +50,7 @@ src/
 │                        PasswordInput, CloseButton, AnimatedBackground,
 │                        AppBackground, TermsModal, ThemeToggle, PageWrapper,
 │                        NavTooltip, SessionExpiredModal, OnboardingTips
-├── config/            → constants.js, env.js  (firebase.js se elimina)
+├── config/            → constants.js, env.js, supabase.js, clerkAppearance.js
 ├── context/           → AppProviders + un contexto por dominio
 ├── hooks/             → un hook por dominio, prefijo use obligatorio
 ├── pages/             → LoginPage, RegisterPage, DashboardPage, IncomesPage,
@@ -326,7 +326,8 @@ en lugar de asumir el método viejo.
 - [x] Etapa 4 — Hooks y contextos: adaptar al nuevo shape de datos
       (AuthContext/useAuth propios eliminados; useUser/useIncomes/useExpenses/
       useCreditCards usan useAuth/useUser de Clerk + useSupabase())
-- [ ] Etapa 5 — Limpieza: borrar Firebase del `package.json`, `.env`, Vercel y el código
+- [x] Etapa 5 — Limpieza: borrar Firebase del `package.json`, `.env` y el código
+      (Vercel pendiente: se hace recién al mergear esta rama a main, ver nota abajo)
 - [ ] Etapa 6 — README técnico y checklist de buenas prácticas
 
 Marcar cada etapa al completarla.
