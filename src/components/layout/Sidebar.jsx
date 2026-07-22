@@ -2,7 +2,7 @@
 
 import { NavLink, Link, useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
-import { useAuth } from '../../hooks/useAuth'
+import { useClerk } from '@clerk/clerk-react'
 import { useUser } from '../../hooks/useUser'
 import ThemeToggle from '../ui/ThemeToggle'
 import Avatar from '../ui/Avatar'
@@ -29,7 +29,7 @@ const NAV_ITEMS = [
 ]
 
 export const NavItems = ({ onItemClick }) => {
-  const { logout } = useAuth()
+  const { signOut } = useClerk()
   const { initials, displayName, profile, fetchProfile } = useUser()
   const navigate = useNavigate()
 
@@ -38,7 +38,7 @@ export const NavItems = ({ onItemClick }) => {
   }, [])
 
   const handleLogout = async () => {
-    await logout()
+    await signOut()
     navigate('/login')
   }
 

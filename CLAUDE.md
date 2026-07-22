@@ -318,7 +318,8 @@ en lugar de asumir el método viejo.
 
 - [x] Etapa 1 — Setup: proyecto Supabase, esquema SQL, RLS, app en Clerk, env vars
       (incluye las 3 env vars nuevas en Vercel — ver docs/etapa-1-setup-manual.md)
-- [ ] Etapa 2 — Auth: Clerk en el router, `PrivateRoute`, eliminar Login/Register propios
+- [x] Etapa 2 — Auth: Clerk en el router, `PrivateRoute`, eliminar Login/Register propios
+      (Firebase AuthContext/useAuth siguen intactos para los demás consumidores hasta Etapa 3-4)
 - [ ] Etapa 3 — Services: reescribir los cinco services contra Supabase
 - [ ] Etapa 4 — Hooks y contextos: adaptar al nuevo shape de datos
 - [ ] Etapa 5 — Limpieza: borrar Firebase del `package.json`, `.env`, Vercel y el código
