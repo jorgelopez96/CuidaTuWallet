@@ -316,7 +316,8 @@ en lugar de asumir el método viejo.
 
 ## 9. Estado de la migración
 
-- [ ] Etapa 1 — Setup: proyecto Supabase, esquema SQL, RLS, app en Clerk, env vars
+- [x] Etapa 1 — Setup: proyecto Supabase, esquema SQL, RLS, app en Clerk, env vars
+      (falta: cargar las 3 env vars nuevas en Vercel — ver docs/etapa-1-setup-manual.md)
 - [ ] Etapa 2 — Auth: Clerk en el router, `PrivateRoute`, eliminar Login/Register propios
 - [ ] Etapa 3 — Services: reescribir los cinco services contra Supabase
 - [ ] Etapa 4 — Hooks y contextos: adaptar al nuevo shape de datos
