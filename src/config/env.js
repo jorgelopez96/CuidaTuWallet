@@ -15,4 +15,11 @@ export const env = {
     messagingSenderId: required('VITE_FIREBASE_MESSAGING_SENDER_ID'),
     appId: required('VITE_FIREBASE_APP_ID'),
   },
+  clerk: {
+    publishableKey: required('VITE_CLERK_PUBLISHABLE_KEY'),
+  },
+  supabase: {
+    url: required('VITE_SUPABASE_URL'),
+    anonKey: required('VITE_SUPABASE_ANON_KEY'),
+  },
 }
