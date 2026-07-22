@@ -323,7 +323,9 @@ en lugar de asumir el método viejo.
 - [x] Etapa 3 — Services: reescribir los cinco services contra Supabase
       (authService eliminado; services reciben el cliente de supabase como
       1er parámetro — la integración real con los hooks es la Etapa 4)
-- [ ] Etapa 4 — Hooks y contextos: adaptar al nuevo shape de datos
+- [x] Etapa 4 — Hooks y contextos: adaptar al nuevo shape de datos
+      (AuthContext/useAuth propios eliminados; useUser/useIncomes/useExpenses/
+      useCreditCards usan useAuth/useUser de Clerk + useSupabase())
 - [ ] Etapa 5 — Limpieza: borrar Firebase del `package.json`, `.env`, Vercel y el código
 - [ ] Etapa 6 — README técnico y checklist de buenas prácticas
 

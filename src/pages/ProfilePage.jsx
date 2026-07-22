@@ -1,8 +1,8 @@
 // src/pages/ProfilePage.jsx
 
 import { useEffect, useState } from 'react'
+import { useUser as useClerkUser } from '@clerk/clerk-react'
 import { useUser } from '../hooks/useUser'
-import { useAuth } from '../hooks/useAuth'
 import Button from '../components/ui/Button'
 import Input from '../components/ui/Input'
 import Card from '../components/ui/Card'
@@ -11,7 +11,8 @@ import PageWrapper from '../components/ui/PageWrapper'
 
 const ProfilePage = () => {
   const { profile, initials, displayName, isLoading, fetchProfile, updateProfile } = useUser()
-  const { user } = useAuth()
+  const { user: clerkUser } = useClerkUser()
+  const email = profile?.email || clerkUser?.primaryEmailAddress?.emailAddress || ''
   const [form, setForm] = useState({ name: '', birthdate: '' })
   const [errors, setErrors] = useState({})
   const [isSaving, setIsSaving] = useState(false)
@@ -46,7 +47,7 @@ const ProfilePage = () => {
     const result = await updateProfile({
       name: form.name.trim(),
       birthdate: form.birthdate,
-      email: profile?.email || user?.email || '',
+      email,
     })
     setIsSaving(false)
     if (result.success) {
@@ -92,7 +93,7 @@ const ProfilePage = () => {
           <Avatar initials={initials} name={profile?.name || ''} size="xl" />
           <h2 className="text-xl font-bold dark:text-white text-slate-900 mt-4">{displayName}</h2>
           <p className="dark:text-slate-400 text-slate-500 text-sm mt-1">
-            {profile?.email || user?.email}
+            {email}
           </p>
           {profile?.birthdate && (
             <p className="dark:text-slate-500 text-slate-400 text-xs mt-1">
@@ -176,7 +177,7 @@ const ProfilePage = () => {
               <div className="flex justify-between items-center py-2 border-b dark:border-white/10 border-slate-100">
                 <span className="text-sm dark:text-slate-400 text-slate-500">Email</span>
                 <span className="text-sm dark:text-white text-slate-900 font-medium truncate ml-4">
-                  {profile?.email || user?.email || '—'}
+                  {email || '—'}
                 </span>
               </div>
               <div className="flex justify-between items-center py-2">
