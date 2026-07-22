@@ -20,6 +20,6 @@ export const env = {
   },
   supabase: {
     url: required('VITE_SUPABASE_URL'),
-    anonKey: required('VITE_SUPABASE_ANON_KEY'),
+    publishableKey: required('VITE_SUPABASE_PUBLISHABLE_KEY'),
   },
 }

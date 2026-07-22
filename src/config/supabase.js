@@ -10,6 +10,6 @@ import { env } from './env'
 // se construye con esta factory dentro de un hook que reciba `getToken`
 // desde `useAuth()` de Clerk.
 export const createClerkSupabaseClient = (getToken) =>
-  createClient(env.supabase.url, env.supabase.anonKey, {
+  createClient(env.supabase.url, env.supabase.publishableKey, {
     accessToken: () => getToken(),
   })

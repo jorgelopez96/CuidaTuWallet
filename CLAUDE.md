@@ -230,8 +230,13 @@ Se eliminan las seis `VITE_FIREBASE_*`. Quedan:
 ```env
 VITE_CLERK_PUBLISHABLE_KEY=pk_test_...
 VITE_SUPABASE_URL=https://xxxxx.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJ...
+VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
 ```
+
+Nota: se usa la **Publishable key** nueva de Supabase (`sb_publishable_...`),
+no la anon key legacy (JWT `eyJ...`). Supabase recomienda la primera para
+proyectos nuevos; ambas funcionan igual con `createClient` (protegidas por
+RLS, no por secreto), es solo una diferencia de nomenclatura/rotación.
 
 `src/config/env.js` valida que estén las tres al arrancar y tira un error claro
 si falta alguna (fail-fast). Mantener ese patrón.
