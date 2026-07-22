@@ -2,7 +2,7 @@
 
 import { useContext, useCallback } from 'react'
 import { UserContext, getInitials } from '../context/UserContext'
-import { getUserProfile, updateUserProfile } from '../services/userService'
+import { getUserProfile, upsertUserProfile } from '../services/userService'
 import { useAuth } from './useAuth'
 import { useToast } from './useToast'
 
@@ -44,7 +44,7 @@ export const useUser = () => {
   const updateProfile = async (data) => {
     if (!user) return { success: false }
     try {
-      await updateUserProfile(user.uid, data)
+      await upsertUserProfile(user.uid, data)
       context.dispatch({ type: 'UPDATE_PROFILE', payload: data })
       addToast('Perfil actualizado', 'success')
       return { success: true }

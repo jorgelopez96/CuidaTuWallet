@@ -1,36 +1,58 @@
 // src/services/expensesService.js
-// Implementación completa en Etapa 2
 
-import { db } from '../config/firebase'
-import {
-  collection,
-  addDoc,
-  getDocs,
-  updateDoc,
-  deleteDoc,
-  doc,
-  query,
-  where,
-} from 'firebase/firestore'
-import { COLLECTIONS } from '../config/constants'
+const mapExpense = (row) => ({
+  id: row.id,
+  userId: row.user_id,
+  description: row.description,
+  amount: Number(row.amount),
+  category: row.category,
+  date: row.date,
+  createdAt: row.created_at,
+})
 
-export const getExpenses = async (userId) => {
-  const q = query(collection(db, COLLECTIONS.EXPENSES), where('userId', '==', userId))
-  const snapshot = await getDocs(q)
-  return snapshot.docs.map((d) => ({ id: d.id, ...d.data() }))
+const toRow = (data) => {
+  const row = {}
+  if ('userId' in data) row.user_id = data.userId
+  if ('description' in data) row.description = data.description
+  if ('amount' in data) row.amount = data.amount
+  if ('category' in data) row.category = data.category
+  if ('date' in data) row.date = data.date
+  return row
 }
 
-export const addExpense = async (data) => {
-  const docRef = await addDoc(collection(db, COLLECTIONS.EXPENSES), data)
-  return { id: docRef.id, ...data }
+export const getExpenses = async (supabase, userId) => {
+  const { data, error } = await supabase
+    .from('expenses')
+    .select('*')
+    .eq('user_id', userId)
+    .order('date', { ascending: false })
+  if (error) throw error
+  return data.map(mapExpense)
 }
 
-export const updateExpense = async (id, data) => {
-  await updateDoc(doc(db, COLLECTIONS.EXPENSES, id), data)
-  return { id, ...data }
+export const addExpense = async (supabase, data) => {
+  const { data: row, error } = await supabase
+    .from('expenses')
+    .insert(toRow(data))
+    .select()
+    .single()
+  if (error) throw error
+  return mapExpense(row)
 }
 
-export const deleteExpense = async (id) => {
-  await deleteDoc(doc(db, COLLECTIONS.EXPENSES, id))
+export const updateExpense = async (supabase, id, data) => {
+  const { data: row, error } = await supabase
+    .from('expenses')
+    .update(toRow(data))
+    .eq('id', id)
+    .select()
+    .single()
+  if (error) throw error
+  return mapExpense(row)
+}
+
+export const deleteExpense = async (supabase, id) => {
+  const { error } = await supabase.from('expenses').delete().eq('id', id)
+  if (error) throw error
   return id
 }

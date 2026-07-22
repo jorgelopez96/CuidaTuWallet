@@ -320,7 +320,9 @@ en lugar de asumir el método viejo.
       (incluye las 3 env vars nuevas en Vercel — ver docs/etapa-1-setup-manual.md)
 - [x] Etapa 2 — Auth: Clerk en el router, `PrivateRoute`, eliminar Login/Register propios
       (Firebase AuthContext/useAuth siguen intactos para los demás consumidores hasta Etapa 3-4)
-- [ ] Etapa 3 — Services: reescribir los cinco services contra Supabase
+- [x] Etapa 3 — Services: reescribir los cinco services contra Supabase
+      (authService eliminado; services reciben el cliente de supabase como
+      1er parámetro — la integración real con los hooks es la Etapa 4)
 - [ ] Etapa 4 — Hooks y contextos: adaptar al nuevo shape de datos
 - [ ] Etapa 5 — Limpieza: borrar Firebase del `package.json`, `.env`, Vercel y el código
 - [ ] Etapa 6 — README técnico y checklist de buenas prácticas
