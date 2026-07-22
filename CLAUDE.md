@@ -326,8 +326,21 @@ en lugar de asumir el método viejo.
 - [x] Etapa 4 — Hooks y contextos: adaptar al nuevo shape de datos
       (AuthContext/useAuth propios eliminados; useUser/useIncomes/useExpenses/
       useCreditCards usan useAuth/useUser de Clerk + useSupabase())
-- [x] Etapa 5 — Limpieza: borrar Firebase del `package.json`, `.env` y el código
-      (Vercel pendiente: se hace recién al mergear esta rama a main, ver nota abajo)
+- [x] Etapa 5 — Limpieza: borrar Firebase del `package.json`, `.env`, Vercel y el código
+      (las 6 env vars de Firebase se borraron de Vercel y se mergeó a main;
+      deploy en producción verificado en cuida-tu-wallet.vercel.app)
 - [ ] Etapa 6 — README técnico y checklist de buenas prácticas
+
+### Pendiente / mejoras futuras (fuera del alcance de las 6 etapas)
+
+- **Clerk Production instance**: hoy corre en modo Development (banner de
+  aviso, límites de uso más bajos). Clerk exige un dominio propio con DNS
+  propio para crear una instancia Production — `cuida-tu-wallet.vercel.app`
+  no sirve porque el DNS es de Vercel, no nuestro. Si en algún momento se
+  compra un dominio propio, retomar desde `dashboard.clerk.com` → "Go to
+  prod" → clonar la instancia de Development.
+- **Google OAuth en Clerk**: usa las credenciales compartidas de desarrollo.
+  Para producción real (con dominio propio) conviene configurar credenciales
+  OAuth propias en Google Cloud Console.
 
 Marcar cada etapa al completarla.
