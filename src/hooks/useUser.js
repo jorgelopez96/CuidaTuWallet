@@ -1,51 +1,48 @@
 // src/hooks/useUser.js
 
 import { useContext, useCallback } from 'react'
+import { useUser as useClerkUser } from '@clerk/clerk-react'
 import { UserContext, getInitials } from '../context/UserContext'
-import { getUserProfile, updateUserProfile } from '../services/userService'
-import { useAuth } from './useAuth'
+import { getUserProfile, upsertUserProfile } from '../services/userService'
+import { useSupabase } from './useSupabase'
 import { useToast } from './useToast'
 
 export const useUser = () => {
   const context = useContext(UserContext)
   if (!context) throw new Error('useUser debe usarse dentro de UserProvider')
 
-  const { user } = useAuth()
+  const { user: clerkUser } = useClerkUser()
+  const supabase = useSupabase()
   const { addToast } = useToast()
+  const userId = clerkUser?.id
 
   // useCallback para que fetchProfile no cambie de referencia en cada render
   const fetchProfile = useCallback(async () => {
-    if (!user) return
+    if (!userId) return
     context.dispatch({ type: 'FETCH_START' })
     try {
-      const profile = await getUserProfile(user.uid)
-      // Si no existe el perfil en Firestore (cuenta vieja), creamos uno mínimo
+      let profile = await getUserProfile(supabase, userId)
+      // Primer login: todavía no hay fila en profiles (incomes/expenses/
+      // credit_cards tienen FK a profiles, así que la necesitamos antes
+      // de que el usuario pueda cargar cualquier dato).
       if (!profile) {
-        const fallback = {
-          name: user.email?.split('@')[0] || 'Usuario',
-          email: user.email || '',
-          birthdate: '',
-        }
-        context.dispatch({ type: 'FETCH_SUCCESS', payload: fallback })
-      } else {
-        context.dispatch({ type: 'FETCH_SUCCESS', payload: profile })
+        profile = await upsertUserProfile(supabase, userId, {
+          name: clerkUser.fullName || clerkUser.primaryEmailAddress?.emailAddress?.split('@')[0] || 'Usuario',
+          email: clerkUser.primaryEmailAddress?.emailAddress || '',
+        })
       }
+      context.dispatch({ type: 'FETCH_SUCCESS', payload: profile })
     } catch {
-      // En caso de error, usar datos mínimos del auth para no romper la UI
-      const fallback = {
-        name: user.email?.split('@')[0] || 'Usuario',
-        email: user.email || '',
-        birthdate: '',
-      }
-      context.dispatch({ type: 'FETCH_SUCCESS', payload: fallback })
+      context.dispatch({ type: 'FETCH_ERROR', payload: 'Error al cargar perfil' })
+      addToast('Error al cargar perfil', 'error')
     }
-  }, [user?.uid])
+  }, [userId, supabase, clerkUser])
 
   const updateProfile = async (data) => {
-    if (!user) return { success: false }
+    if (!userId) return { success: false }
     try {
-      await updateUserProfile(user.uid, data)
-      context.dispatch({ type: 'UPDATE_PROFILE', payload: data })
+      const updated = await upsertUserProfile(supabase, userId, data)
+      context.dispatch({ type: 'UPDATE_PROFILE', payload: updated })
       addToast('Perfil actualizado', 'success')
       return { success: true }
     } catch {
@@ -55,7 +52,7 @@ export const useUser = () => {
   }
 
   const initials = getInitials(context.profile?.name)
-  const displayName = context.profile?.name?.split(' ')[0] || user?.email?.split('@')[0] || 'Usuario'
+  const displayName = context.profile?.name?.split(' ')[0] || clerkUser?.firstName || 'Usuario'
 
   return { ...context, fetchProfile, updateProfile, initials, displayName }
 }

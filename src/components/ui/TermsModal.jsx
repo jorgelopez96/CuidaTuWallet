@@ -19,7 +19,7 @@ const TermsModal = ({ isOpen, onClose }) => (
       <h3 className="text-white font-semibold">2. Privacidad de datos</h3>
       <p>
         Los datos que ingresás (ingresos, gastos, tarjetas) se almacenan de forma segura en
-        Firebase Firestore y solo son accesibles por vos mediante tu cuenta autenticada.
+        Supabase y solo son accesibles por vos mediante tu cuenta autenticada.
       </p>
       <h3 className="text-white font-semibold">3. Responsabilidad</h3>
       <p>

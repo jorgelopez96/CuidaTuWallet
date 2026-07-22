@@ -1,6 +1,7 @@
 // src/hooks/useCreditCards.js
 
 import { useContext, useCallback } from 'react'
+import { useAuth } from '@clerk/clerk-react'
 import {
   CreditCardsContext,
   getTotalCardDebt,
@@ -10,42 +11,43 @@ import {
   getCards, addCard, deleteCard, updateCardData,
   getCardExpenses, addCardExpense, updateCardExpense, deleteCardExpense,
 } from '../services/creditCardsService'
-import { useAuth } from './useAuth'
+import { useSupabase } from './useSupabase'
 import { useToast } from './useToast'
 
 export const useCreditCards = () => {
   const context = useContext(CreditCardsContext)
   if (!context) throw new Error('useCreditCards debe usarse dentro de CreditCardsProvider')
 
-  const { user } = useAuth()
+  const { userId } = useAuth()
+  const supabase = useSupabase()
   const { addToast } = useToast()
 
   const fetchCards = useCallback(async () => {
-    if (!user) return
+    if (!userId) return
     context.dispatch({ type: 'FETCH_START' })
     try {
-      const data = await getCards(user.uid)
+      const data = await getCards(supabase, userId)
       context.dispatch({ type: 'FETCH_SUCCESS_CARDS', payload: data })
     } catch {
       context.dispatch({ type: 'FETCH_ERROR', payload: 'Error al cargar tarjetas' })
       addToast('Error al cargar tarjetas', 'error')
     }
-  }, [user])
+  }, [userId, supabase])
 
   const fetchCardExpenses = useCallback(async () => {
-    if (!user) return
+    if (!userId) return
     try {
-      const data = await getCardExpenses(user.uid)
+      const data = await getCardExpenses(supabase, userId)
       context.dispatch({ type: 'FETCH_SUCCESS_EXPENSES', payload: data })
     } catch {
       addToast('Error al cargar gastos de tarjeta', 'error')
     }
-  }, [user])
+  }, [userId, supabase])
 
   const createCard = async (formData) => {
     try {
-      const data = { ...formData, userId: user.uid, createdAt: new Date().toISOString() }
-      const newCard = await addCard(data)
+      const data = { ...formData, userId }
+      const newCard = await addCard(supabase, data)
       context.dispatch({ type: 'ADD_CARD', payload: newCard })
       addToast('Tarjeta agregada', 'success')
       return { success: true }
@@ -57,7 +59,7 @@ export const useCreditCards = () => {
 
   const updateCard = async (id, data) => {
     try {
-      const updated = await updateCardData(id, data)
+      const updated = await updateCardData(supabase, id, data)
       context.dispatch({ type: 'UPDATE_CARD', payload: updated })
       addToast('Tarjeta actualizada', 'success')
       return { success: true }
@@ -69,7 +71,7 @@ export const useCreditCards = () => {
 
   const removeCard = async (id) => {
     try {
-      await deleteCard(id)
+      await deleteCard(supabase, id)
       context.dispatch({ type: 'DELETE_CARD', payload: id })
       addToast('Tarjeta eliminada', 'success')
     } catch {
@@ -79,8 +81,8 @@ export const useCreditCards = () => {
 
   const createCardExpense = async (formData) => {
     try {
-      const data = { ...formData, userId: user.uid, createdAt: new Date().toISOString() }
-      const newExpense = await addCardExpense(data)
+      const data = { ...formData, userId }
+      const newExpense = await addCardExpense(supabase, data)
       context.dispatch({ type: 'ADD_CARD_EXPENSE', payload: newExpense })
       addToast('Gasto de tarjeta registrado', 'success')
       return { success: true }
@@ -92,7 +94,7 @@ export const useCreditCards = () => {
 
   const editCardExpense = async (id, formData) => {
     try {
-      const updated = await updateCardExpense(id, formData)
+      const updated = await updateCardExpense(supabase, id, formData)
       context.dispatch({ type: 'UPDATE_CARD_EXPENSE', payload: updated })
       addToast('Gasto actualizado', 'success')
       return { success: true }
@@ -104,7 +106,7 @@ export const useCreditCards = () => {
 
   const removeCardExpense = async (id) => {
     try {
-      await deleteCardExpense(id)
+      await deleteCardExpense(supabase, id)
       context.dispatch({ type: 'DELETE_CARD_EXPENSE', payload: id })
       addToast('Gasto eliminado', 'success')
     } catch {

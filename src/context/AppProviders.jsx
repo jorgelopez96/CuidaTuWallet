@@ -1,16 +1,18 @@
 // src/context/AppProviders.jsx
 
+import { ClerkProvider } from '@clerk/clerk-react'
 import { ThemeProvider } from './ThemeContext'
-import { AuthProvider } from './AuthContext'
 import { UserProvider } from './UserContext'
 import { IncomesProvider } from './IncomesContext'
 import { ExpensesProvider } from './ExpensesContext'
 import { CreditCardsProvider } from './CreditCardsContext'
 import { ToastProvider } from './ToastContext'
+import { env } from '../config/env'
+import { clerkAppearance } from '../config/clerkAppearance'
 
 const AppProviders = ({ children }) => (
-  <ThemeProvider>
-    <AuthProvider>
+  <ClerkProvider publishableKey={env.clerk.publishableKey} appearance={clerkAppearance} afterSignOutUrl="/login">
+    <ThemeProvider>
       <ToastProvider>
         <UserProvider>
           <IncomesProvider>
@@ -22,8 +24,8 @@ const AppProviders = ({ children }) => (
           </IncomesProvider>
         </UserProvider>
       </ToastProvider>
-    </AuthProvider>
-  </ThemeProvider>
+    </ThemeProvider>
+  </ClerkProvider>
 )
 
 export default AppProviders

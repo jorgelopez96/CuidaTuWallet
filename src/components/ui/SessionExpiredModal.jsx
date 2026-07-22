@@ -1,20 +1,8 @@
 // src/components/ui/SessionExpiredModal.jsx
 
-import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../../hooks/useAuth'
 import Button from './Button'
 
-const SessionExpiredModal = () => {
-  const { sessionExpired, dispatch } = useAuth()
-  const navigate = useNavigate()
-
-  if (!sessionExpired) return null
-
-  const handleGoToLogin = () => {
-    dispatch({ type: 'CLEAR_USER' })
-    navigate('/login')
-  }
-
+const SessionExpiredModal = ({ onGoToLogin }) => {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
@@ -34,7 +22,7 @@ const SessionExpiredModal = () => {
           Por seguridad, cerramos tu sesión automáticamente después de 30 minutos de inactividad.
         </p>
 
-        <Button onClick={handleGoToLogin} className="w-full" size="lg">
+        <Button onClick={onGoToLogin} className="w-full" size="lg">
           Volver a iniciar sesión
         </Button>
       </div>
