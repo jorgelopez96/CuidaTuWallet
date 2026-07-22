@@ -22,18 +22,22 @@ atajos que no se puedan justificar.
 
 ## 2. Stack
 
-| Capa | Actual | Objetivo tras la migración |
-|---|---|---|
-| Framework | React 18 + Vite | sin cambios |
-| Routing | React Router DOM v6 | sin cambios |
-| Estado global | Context API + useReducer | sin cambios |
-| Base de datos | Firebase Firestore | **Supabase (Postgres)** |
-| Autenticación | Firebase Auth | **Clerk** (Google + email) |
-| Estilos | Tailwind CSS | sin cambios |
-| Linter | ESLint + Prettier | sin cambios |
-| Deploy | Vercel | sin cambios |
+| Capa | Tecnología |
+|---|---|
+| Framework | React 18 + Vite |
+| Routing | React Router DOM v6 |
+| Estado global | Context API + useReducer |
+| Base de datos | **Supabase (Postgres)** |
+| Autenticación | **Clerk** (Google + email) |
+| Estilos | Tailwind CSS |
+| Linter | ESLint + Prettier |
+| Deploy | Vercel |
 
 No agregar librerías fuera de este stack sin aprobación explícita.
+
+> Este proyecto arrancó con Firebase (Auth + Firestore) y se migró a
+> Supabase + Clerk entre el 2026-07-22. Ver sección 9 para el historial
+> de la migración y `README.md` para los trade-offs de cada decisión.
 
 ---
 
@@ -103,7 +107,7 @@ La UI **nunca** llama a un service directamente.
 
 ## 5. Modelo de datos
 
-### Estado actual en Firestore (colecciones)
+### Esquema anterior en Firestore (pre-migración, referencia histórica)
 
 | Colección | Campos |
 |---|---|
@@ -113,7 +117,7 @@ La UI **nunca** llama a un service directamente.
 | `creditCards` | `userId`, `alias`, `type`, `lastFour`, `closingDay`, `createdAt` |
 | `cardExpenses` | `userId`, `cardId`, `description`, `totalAmount`, `totalInstallments`, `paidInstallments`, `currentInstallmentAmount`, `remainingInstallments`, `date`, `createdAt` |
 
-### Esquema objetivo en Supabase (Postgres)
+### Esquema actual en Supabase (Postgres)
 
 Convención: `snake_case` en la base, `camelCase` en el front. Los services hacen
 el mapeo — **el resto de la app no se entera del cambio de nombres**.
@@ -329,7 +333,10 @@ en lugar de asumir el método viejo.
 - [x] Etapa 5 — Limpieza: borrar Firebase del `package.json`, `.env`, Vercel y el código
       (las 6 env vars de Firebase se borraron de Vercel y se mergeó a main;
       deploy en producción verificado en cuida-tu-wallet.vercel.app)
-- [ ] Etapa 6 — README técnico y checklist de buenas prácticas
+- [x] Etapa 6 — README técnico y checklist de buenas prácticas
+
+**Migración completa.** Las 6 etapas están cerradas, mergeadas a `main` y
+verificadas en producción (`cuida-tu-wallet.vercel.app`).
 
 ### Pendiente / mejoras futuras (fuera del alcance de las 6 etapas)
 
@@ -342,5 +349,5 @@ en lugar de asumir el método viejo.
 - **Google OAuth en Clerk**: usa las credenciales compartidas de desarrollo.
   Para producción real (con dominio propio) conviene configurar credenciales
   OAuth propias en Google Cloud Console.
-
-Marcar cada etapa al completarla.
+- Code splitting del bundle y warnings de `react-hooks/exhaustive-deps`
+  pendientes — ver README.md § Mejoras futuras.
