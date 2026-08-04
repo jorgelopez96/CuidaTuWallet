@@ -1,36 +1,132 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CuidaTuWallet
 
-## Getting Started
+App web para controlar gastos e ingresos mes a mes. Registra ingresos (sueldo,
+ventas), gastos sueltos (supermercado, transporte, suscripciones) y gastos de
+tarjeta de crédito —incluidas las cuotas— y calcula cuánta plata queda
+disponible en el mes.
 
-First, run the development server:
+Lee resúmenes de tarjeta en PDF y carga los consumos automáticamente.
+
+## Stack
+
+| Capa | Herramienta |
+|---|---|
+| Framework | Next.js 16 (App Router, React 19) |
+| Lenguaje | TypeScript |
+| Estilos | Tailwind CSS v4 + shadcn/ui |
+| Animaciones | Motion (Framer Motion) |
+| Autenticación | Clerk |
+| Base de datos | Supabase (Postgres + RLS) |
+| Gráficos | Recharts |
+| Lectura de PDF | unpdf, en el navegador |
+| Deploy | Vercel |
+
+## Arranque local
 
 ```bash
+git clone <url-del-repo>
+cd cuidatuwallet
+npm install
+cp .env.local.example .env.local   # completar con las claves
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+La app queda en <http://localhost:3000>.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Variables de entorno
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Variable | Dónde sacarla |
+|---|---|
+| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Clerk → API keys |
+| `CLERK_SECRET_KEY` | Clerk → API keys |
+| `NEXT_PUBLIC_CLERK_SIGN_IN_URL` | `/login` |
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase → Project settings |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Supabase → API keys |
+| `CRON_SECRET` | La genera Vercel al crear el cron; en local puede ir vacía |
 
-## Learn More
+## Comandos
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run dev     # desarrollo
+npm run build   # build de producción
+npm run start   # servir el build
+npm run lint    # eslint
+npm test        # tests de la lógica de negocio
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Base de datos
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Las migraciones están en `supabase/migrations/`, en orden. Se aplican desde el
+SQL Editor de Supabase.
 
-## Deploy on Vercel
+Tres tablas —`ingresos`, `tarjetas`, `gastos`— todas con `user_id` y **Row Level
+Security**: cada fila solo es visible para su dueño, comparando
+`auth.jwt() ->> 'sub'` contra el `user_id`. El `user_id` no lo manda el cliente:
+lo pone Postgres por defecto a partir del token.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Cómo se conectan Clerk y Supabase
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Clerk está dado de alta como *third-party auth provider* en Supabase. El token
+de sesión de Clerk viaja en cada consulta y Postgres lo valida contra el JWKS de
+Clerk, así que la autorización vive en la base y no en el frontend.
+
+### Las dos fechas de un gasto
+
+- `fecha` — el mes al que **imputa** el gasto. En un resumen de tarjeta es el
+  vencimiento: la cuota se paga cuando vence el resumen.
+- `fecha_compra` — cuándo se hizo la compra original. Solo para consumos
+  importados de un resumen.
+
+La distinción importa: una cuota 12/12 de una compra de hace un año se paga
+**este** mes, y es este mes el que tiene que descontar del disponible.
+
+## Lectura de resúmenes
+
+`src/lib/resumen-parser.ts` extrae los consumos del texto de un resumen.
+Reconoce el formato de Galicia (VISA y Amex comparten layout) y tiene un formato
+genérico de respaldo para texto pegado de otros bancos.
+
+El PDF se procesa **en el navegador**: el archivo nunca se sube a ningún
+servidor ni se guarda. Lo detectado se muestra para revisar antes de guardar;
+nunca se inserta a ciegas.
+
+Para probar el parser contra un PDF real, sin tocar la base:
+
+```bash
+npx tsx scripts/probar-resumen.mjs "ruta/al/resumen.pdf"
+```
+
+## Estructura
+
+```
+src/
+  app/
+    (app)/            # zona autenticada: sidebar + secciones
+      _actions/       # server actions por dominio
+      tarjetas/[id]/  # detalle de cada tarjeta
+    api/ping/         # cron diario que evita que Supabase pause el proyecto
+    login/
+  components/         # UI propia
+    ui/               # componentes de shadcn
+  hooks/
+  lib/                # lógica de negocio pura, con sus tests al lado
+supabase/migrations/
+scripts/              # utilidades de desarrollo
+public/marcas/        # logos de las redes de tarjeta
+```
+
+La lógica de negocio vive en `src/lib/` sin dependencias de React ni de la base,
+y cada archivo tiene su test al lado (`*.test.ts`). Las páginas hacen I/O y
+presentación; las server actions validan antes de escribir, y la base vuelve a
+validar con constraints y RLS.
+
+## Deploy
+
+Deploy en Vercel. El cron de `vercel.json` pega en `/api/ping` una vez por día
+para que Supabase no pause el proyecto por inactividad; el endpoint exige el
+header `Authorization: Bearer $CRON_SECRET`.
+
+## Marcas
+
+Los logos de `public/marcas/` son marcas registradas de sus titulares y se usan
+únicamente para identificar la tarjeta de cada usuario.

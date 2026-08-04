@@ -1,0 +1,69 @@
+// src/lib/resumen.ts
+
+import { CATEGORIAS } from "@/lib/catalogos";
+
+export type Monto = { monto: number | string };
+
+export function total(items: Monto[]): number {
+  return items.reduce((suma, { monto }) => suma + Number(monto), 0);
+}
+
+export function resumenMensual(ingresos: Monto[], gastos: Monto[]) {
+  const cobrado = total(ingresos);
+  const gastado = total(gastos);
+  return { cobrado, gastado, disponible: cobrado - gastado };
+}
+
+/** Separa lo que gastaste vos de lo que gastó un tercero al que le prestaste la tarjeta. */
+export function totalesPorTitular(gastos: (Monto & { es_propio: boolean })[]) {
+  return {
+    propios: total(gastos.filter((g) => g.es_propio)),
+    ajenos: total(gastos.filter((g) => !g.es_propio)),
+  };
+}
+
+/** Gastos agrupados por categoría, de mayor a menor. Sin categoría cae en "Otros". */
+export function porCategoria(gastos: (Monto & { categoria?: string | null })[]) {
+  const suma = new Map<string, number>();
+  for (const { categoria, monto } of gastos) {
+    const clave = categoria?.trim() || "Otros";
+    suma.set(clave, (suma.get(clave) ?? 0) + Number(monto));
+  }
+  return [...suma]
+    .map(([categoria, monto]) => ({ categoria, monto }))
+    .sort((a, b) => b.monto - a.monto);
+}
+
+/**
+ * Agrupa gastos por categoría respetando el orden de CATEGORIAS, así "Otros"
+ * queda último. Solo devuelve las categorías que tienen algo.
+ */
+export function agruparPorCategoria<T extends { categoria?: string | null }>(
+  gastos: T[],
+): { categoria: string; gastos: T[] }[] {
+  const orden = [...CATEGORIAS] as string[];
+
+  return [...new Set(gastos.map((g) => g.categoria?.trim() || "Otros"))]
+    .sort((a, b) => {
+      const ia = orden.indexOf(a);
+      const ib = orden.indexOf(b);
+      // Las categorías desconocidas (datos viejos) van al final, alfabéticas.
+      return (ia < 0 ? orden.length : ia) - (ib < 0 ? orden.length : ib) ||
+        a.localeCompare(b);
+    })
+    .map((categoria) => ({
+      categoria,
+      gastos: gastos.filter((g) => (g.categoria?.trim() || "Otros") === categoria),
+    }));
+}
+
+/** Primer y último día del mes de `fecha`, en ISO (yyyy-mm-dd) para filtrar en Postgres. */
+export function rangoDelMes(fecha: Date) {
+  const y = fecha.getFullYear();
+  const m = fecha.getMonth();
+  const iso = (d: Date) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
+      d.getDate(),
+    ).padStart(2, "0")}`;
+  return { desde: iso(new Date(y, m, 1)), hasta: iso(new Date(y, m + 1, 0)) };
+}

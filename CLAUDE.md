@@ -32,9 +32,11 @@ Sidebar lateral izquierdo con:
    Cada gasto de tarjeta debe poder marcarse como propio o ajeno (préstamo de
    tarjeta a terceros), mostrando el total de cada uno por separado. Opción de
    borrar tarjetas con doble confirmación.
-3. **Consumos** (nombre a definir): carga de gastos sueltos — carnicería,
-   verdulería, suscripciones (Netflix, Spotify, etc.), transporte (SUBE, Uber) —
-   que también descuentan del dinero disponible.
+3. **Consumos**: carga de gastos sueltos — carnicería, verdulería,
+   suscripciones (Netflix, Spotify, etc.), transporte (SUBE, Uber) — que también
+   descuentan del dinero disponible. Se listan agrupados por categoría
+   (Suscripciones, Supermercado, Transporte, Otros) con subtotal por grupo, y
+   cada gasto muestra su medio de pago (efectivo, débito, transferencia).
 4. **Perfil** (ícono): editar nombre y fecha de nacimiento.
 
 ## Decisiones de diseño
@@ -45,10 +47,15 @@ Sidebar lateral izquierdo con:
 - Sidebar lateral en desktop
 - Fondo animado con gradiente sutil en login
 - Onboarding con tooltips la primera vez que se usa cada sección del menú
-- Sin foto de perfil — avatar con iniciales del nombre
+- Avatar: si entró con Google se usa esa foto; si no, las iniciales del nombre
 - Ingresos tipo sueldo se archivan al vencer el mes, quedan en historial mes a mes
 - Gráfico de torta en el dashboard para distribución de gastos
 - Cada tarjeta de crédito tiene su propia página con sus gastos
+- Los montos se tipean con separador de miles (1.500.000), formato es-AR
+- La grilla de Tarjetas muestra el total consolidado de todas: Total, Propios y
+  De terceros
+- Pendiente (fase visual): cada tarjeta con el logo real de su marca (Visa,
+  Mastercard, Amex, Naranja X) y la tipografía del banco
 
 ## Reglas de trabajo
 
