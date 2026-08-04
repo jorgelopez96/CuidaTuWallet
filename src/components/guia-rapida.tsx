@@ -2,120 +2,101 @@
 "use client";
 
 import { useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
-import {
-  CreditCard,
-  HelpCircle,
-  LayoutDashboard,
-  ShoppingBasket,
-  User,
-  X,
-  type LucideIcon,
-} from "lucide-react";
+import { motion } from "motion/react";
+import { ArrowLeft, ArrowRight, HelpCircle } from "lucide-react";
+import { PASOS_GUIA } from "@/lib/pasos-guia";
 import { Button } from "@/components/ui/button";
-
-type Paso = { icono: LucideIcon; titulo: string; detalle: string };
-
-const PASOS: Paso[] = [
-  {
-    icono: LayoutDashboard,
-    titulo: "Inicio",
-    detalle:
-      "Cargá tus ingresos del mes. El disponible se calcula solo: ingresos menos todos los gastos.",
-  },
-  {
-    icono: CreditCard,
-    titulo: "Tarjetas",
-    detalle:
-      "Una tarjeta por cada plástico. Entrá al detalle para cargar gastos a mano o subir el PDF del resumen: los consumos se cargan solos.",
-  },
-  {
-    icono: ShoppingBasket,
-    titulo: "Consumos",
-    detalle:
-      "Lo que pagás fuera de la tarjeta de crédito. Se agrupa por categoría y podés filtrar tocando los chips.",
-  },
-  {
-    icono: User,
-    titulo: "Perfil",
-    detalle: "Abajo a la izquierda, en tu nombre. Editás tus datos y cerrás sesión.",
-  },
-];
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 /**
- * Guía flotante. El estado vive en memoria a propósito: al recargar la página
- * vuelve a aparecer, así siempre está a mano sin ensuciar el localStorage.
+ * Recorrido guiado por la app, paso a paso. El paso vuelve a cero cada vez que
+ * se abre: la guía es para consultarla entera, no para dejarla a la mitad.
  */
 export function GuiaRapida() {
-  const [visible, setVisible] = useState(true);
   const [abierta, setAbierta] = useState(false);
+  const [paso, setPaso] = useState(0);
 
-  if (!visible) return null;
+  const { icono: Icono, titulo, detalle } = PASOS_GUIA[paso];
+  const ultimo = paso === PASOS_GUIA.length - 1;
+
+  function abrir(v: boolean) {
+    setAbierta(v);
+    if (v) setPaso(0);
+  }
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-3">
-      <AnimatePresence>
-        {abierta && (
-          <motion.div
-            initial={{ opacity: 0, y: 12, scale: 0.97 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 12, scale: 0.97 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
-            className="w-[min(22rem,calc(100vw-2rem))] rounded-2xl border bg-popover p-5 shadow-xl backdrop-blur-md"
-          >
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="font-semibold">Guía rápida</p>
-                <p className="text-xs text-muted-foreground">
-                  Cómo se usa CuidaTuWallet
-                </p>
-              </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label="Cerrar guía"
-                onClick={() => setAbierta(false)}
-              >
-                <X />
+    <Dialog open={abierta} onOpenChange={abrir}>
+      <DialogTrigger asChild>
+        <Button
+          variant="outline"
+          size="icon"
+          aria-label="Abrir la guía de la app"
+          className="elevable fixed bottom-4 right-4 z-50 size-11 rounded-[14px] bg-card text-primary shadow-lg backdrop-blur-md"
+        >
+          <HelpCircle className="size-5" />
+        </Button>
+      </DialogTrigger>
+
+      <DialogContent className="sm:max-w-md">
+        {/*
+          La key remonta el bloque y vuelve a correr la entrada. Sin
+          AnimatePresence a propósito: esperar la salida deja el modal vacío y
+          lo hace saltar de alto. El min-h fija el piso para que los botones no
+          se muevan entre pasos.
+        */}
+        <motion.div
+          key={paso}
+          initial={{ opacity: 0, x: 16 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.22, ease: "easeOut" }}
+          className="flex min-h-40 flex-col gap-3"
+        >
+          <span className="flex size-11 items-center justify-center rounded-[14px] bg-primary/15 text-primary">
+            <Icono className="size-5" />
+          </span>
+          <DialogTitle className="text-xl">{titulo}</DialogTitle>
+          <DialogDescription className="text-sm leading-relaxed">
+            {detalle}
+          </DialogDescription>
+        </motion.div>
+
+        <div className="mt-2 flex items-center justify-between gap-4">
+          <div className="flex gap-1.5" aria-hidden>
+            {PASOS_GUIA.map((p, i) => (
+              <span
+                key={p.titulo}
+                className={`h-1.5 rounded-full transition-all ${
+                  i === paso ? "w-5 bg-primary" : "w-1.5 bg-muted-foreground/35"
+                }`}
+              />
+            ))}
+          </div>
+
+          <div className="flex gap-2">
+            {paso > 0 && (
+              <Button variant="ghost" onClick={() => setPaso((p) => p - 1)}>
+                <ArrowLeft /> Atrás
               </Button>
-            </div>
-
-            <ul className="mt-4 flex flex-col gap-4">
-              {PASOS.map(({ icono: Icono, titulo, detalle }) => (
-                <li key={titulo} className="flex gap-3">
-                  <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/15 text-primary">
-                    <Icono className="size-4" />
-                  </span>
-                  <div>
-                    <p className="text-sm font-medium">{titulo}</p>
-                    <p className="text-xs leading-relaxed text-muted-foreground">
-                      {detalle}
-                    </p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-
-            <button
-              type="button"
-              onClick={() => setVisible(false)}
-              className="mt-4 w-full text-xs text-muted-foreground underline-offset-2 hover:underline"
+            )}
+            <Button
+              onClick={() => (ultimo ? setAbierta(false) : setPaso((p) => p + 1))}
             >
-              Ocultar hasta recargar la página
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+              {ultimo ? "Listo" : "Siguiente"}
+              {!ultimo && <ArrowRight />}
+            </Button>
+          </div>
+        </div>
 
-      <Button
-        size="icon"
-        aria-label={abierta ? "Cerrar guía rápida" : "Abrir guía rápida"}
-        aria-expanded={abierta}
-        onClick={() => setAbierta((a) => !a)}
-        className="size-12 rounded-full shadow-lg shadow-primary/25"
-      >
-        {abierta ? <X className="size-5" /> : <HelpCircle className="size-5" />}
-      </Button>
-    </div>
+        <p className="text-center text-xs text-muted-foreground">
+          Paso {paso + 1} de {PASOS_GUIA.length}
+        </p>
+      </DialogContent>
+    </Dialog>
   );
 }

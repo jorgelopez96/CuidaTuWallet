@@ -6,6 +6,7 @@ import {
   agruparPorDia,
   faltaPagar,
   porCategoria,
+  proyeccionDeCuotas,
   rangoDelMes,
   resumenMensual,
   total,
@@ -126,5 +127,42 @@ assert.equal(variacion(80, 100), -20);
 assert.equal(variacion(500, 0), null);
 // Con base negativa el signo sigue teniendo sentido.
 assert.equal(variacion(-50, -100), 50);
+
+// --- proyección de cuotas a futuro ----------------------------------------
+// Cuota 4/12 con monto 100 en agosto: agosto y los 8 meses siguientes.
+const proy = proyeccionDeCuotas(new Date(2026, 7, 4), 4, [
+  { fecha: "2026-08-03", monto: 100, cuota_actual: 4, cuotas_total: 12 },
+]);
+assert.deepEqual(proy, [
+  { mes: "2026-08", monto: 100 },
+  { mes: "2026-09", monto: 100 },
+  { mes: "2026-10", monto: 100 },
+  { mes: "2026-11", monto: 100 },
+]);
+
+// La última cuota no proyecta nada hacia adelante.
+const ultima = proyeccionDeCuotas(new Date(2026, 7, 4), 3, [
+  { fecha: "2026-08-03", monto: 500, cuota_actual: 6, cuotas_total: 6 },
+]);
+assert.deepEqual(ultima.map((m) => m.monto), [500, 0, 0]);
+
+// Un gasto sin cuotas no entra: el gráfico es solo de cuotas.
+assert.deepEqual(
+  proyeccionDeCuotas(new Date(2026, 7, 4), 2, [
+    { fecha: "2026-08-03", monto: 900, cuota_actual: null, cuotas_total: null },
+  ]).map((m) => m.monto),
+  [0, 0],
+);
+
+// Varias compras se suman en el mismo mes, y cruza el año sin romperse.
+const suma = proyeccionDeCuotas(new Date(2026, 10, 1), 3, [
+  { fecha: "2026-11-05", monto: 100, cuota_actual: 1, cuotas_total: 3 },
+  { fecha: "2026-11-20", monto: 50, cuota_actual: 1, cuotas_total: 2 },
+]);
+assert.deepEqual(suma, [
+  { mes: "2026-11", monto: 150 },
+  { mes: "2026-12", monto: 150 },
+  { mes: "2027-01", monto: 100 },
+]);
 
 console.info("resumen.ts ok");

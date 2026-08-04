@@ -6,7 +6,6 @@ import { rangoDelMes, total } from "@/lib/resumen";
 import { Card } from "@/components/ui/card";
 import { FiltroCategorias } from "@/components/filtro-categorias";
 import { GastoForm } from "@/components/gasto-form";
-import { Hint } from "@/components/hint";
 import { Vacio } from "@/components/vacio";
 
 export default async function ConsumosPage() {
@@ -36,11 +35,6 @@ export default async function ConsumosPage() {
         </div>
         <GastoForm />
       </div>
-
-      <Hint id="consumos">
-        Los gastos sueltos van acá: verdulería, SUBE, Netflix, un Uber. Todo lo que
-        cargues descuenta del disponible del mes.
-      </Hint>
 
       {data?.length ? (
         <FiltroCategorias gastos={data} />

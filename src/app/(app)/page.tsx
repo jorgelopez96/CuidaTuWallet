@@ -3,6 +3,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { enPesos } from "@/lib/formato";
 import {
   porCategoria,
+  proyeccionDeCuotas,
   rangoDelMes,
   serieMensual,
   variacion,
@@ -12,19 +13,19 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarrasMensuales } from "@/components/barras-mensuales";
 import { EcuacionDelMes } from "@/components/ecuacion-del-mes";
 import { GraficoGastos } from "@/components/grafico-gastos";
-import { Hint } from "@/components/hint";
 import { IngresoForm } from "@/components/ingreso-form";
 import { ListaIngresos } from "@/components/lista-ingresos";
 
-const MESES_DEL_GRAFICO = 6;
+/** Este mes y el anterior: lo justo para la comparación de la ecuación. */
+const MESES_COMPARADOS = 2;
+const MESES_PROYECTADOS = 6;
 
 export default async function InicioPage() {
   const supabase = createServerSupabaseClient();
   const hoy = new Date();
-  const { desde, hasta } = ventanaDeMeses(hoy, MESES_DEL_GRAFICO);
+  const { desde, hasta } = ventanaDeMeses(hoy, MESES_COMPARADOS);
   const mesActual = rangoDelMes(hoy);
 
-  // Una sola ventana de seis meses: de ahí salen el resumen del mes y la serie.
   const [ing, gas] = await Promise.all([
     supabase
       .from("ingresos")
@@ -34,7 +35,7 @@ export default async function InicioPage() {
       .order("fecha", { ascending: false }),
     supabase
       .from("gastos")
-      .select("monto, categoria, fecha")
+      .select("monto, categoria, fecha, cuota_actual, cuotas_total")
       .gte("fecha", desde)
       .lte("fecha", hasta),
   ]);
@@ -46,7 +47,7 @@ export default async function InicioPage() {
   const ingresos = ing.data ?? [];
   const gastos = gas.data ?? [];
 
-  const serie = serieMensual(hoy, MESES_DEL_GRAFICO, ingresos, gastos);
+  const serie = serieMensual(hoy, MESES_COMPARADOS, ingresos, gastos);
   const actual = serie[serie.length - 1];
   const anterior = serie[serie.length - 2];
   const cambio = variacion(actual.disponible, anterior?.disponible ?? 0);
@@ -57,17 +58,16 @@ export default async function InicioPage() {
   const ingresosDelMes = delMes(ingresos);
   const gastosDelMes = delMes(gastos);
 
+  // Solo las cuotas de este mes: las de meses anteriores ya fueron reemplazadas
+  // por la fila del resumen siguiente y contarlas duplicaría el compromiso.
+  const proyeccion = proyeccionDeCuotas(hoy, MESES_PROYECTADOS, gastosDelMes);
+
   return (
     <>
       <div className="flex items-center justify-between gap-4">
         <h1 className="text-2xl font-semibold">Inicio</h1>
         <IngresoForm />
       </div>
-
-      <Hint id="inicio">
-        Acá ves cuánto entró y cuánto gastaste este mes. El disponible se calcula
-        restando todos los gastos —sueltos y de tarjeta— a tus ingresos.
-      </Hint>
 
       <EcuacionDelMes
         cobrado={actual.cobrado}
@@ -82,13 +82,13 @@ export default async function InicioPage() {
       <div className="grid gap-4 lg:grid-cols-2">
         <Card className="elevable">
           <CardHeader className="flex items-center justify-between gap-2">
-            <CardTitle>Disponible mes a mes</CardTitle>
+            <CardTitle>Lo que viene</CardTitle>
             <span className="text-xs text-muted-foreground">
-              Últimos {MESES_DEL_GRAFICO} meses
+              Cuánto pagás en cuotas, mes a mes
             </span>
           </CardHeader>
           <CardContent>
-            <BarrasMensuales serie={serie} />
+            <BarrasMensuales serie={proyeccion} />
           </CardContent>
         </Card>
 

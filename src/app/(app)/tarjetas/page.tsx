@@ -3,7 +3,6 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { totalesPorTitular } from "@/lib/resumen";
 import { CreditCard } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { Hint } from "@/components/hint";
 import { Vacio } from "@/components/vacio";
 import { TotalesGastos } from "@/components/totales-gastos";
 import { TarjetaForm } from "@/components/tarjeta-form";
@@ -43,12 +42,6 @@ export default async function TarjetasPage() {
         <h1 className="text-2xl font-semibold">Tarjetas</h1>
         <TarjetaForm />
       </div>
-
-      <Hint id="tarjetas">
-        Cargá tus tarjetas de crédito y entrá a cada una para ver sus gastos. Podés
-        subir el resumen y que los consumos se carguen solos: el archivo se lee al
-        vuelo y no se guarda en ningún lado.
-      </Hint>
 
       <TotalesGastos propios={propios} ajenos={ajenos} />
 

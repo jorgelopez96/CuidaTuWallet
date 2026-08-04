@@ -11,10 +11,7 @@ const MESES = [
 /** "2026-07" → "julio" */
 const nombreDeMes = (clave: string) => MESES[Number(clave.slice(5, 7)) - 1];
 
-/**
- * Lo que entró menos lo que salió da el disponible. La resta va explícita
- * porque es la única cuenta que hace la app y conviene que se lea.
- */
+/** Lo que entró, lo que salió y el disponible que queda del mes. */
 export function EcuacionDelMes({
   cobrado,
   gastado,
@@ -49,8 +46,6 @@ export function EcuacionDelMes({
           </p>
         </div>
 
-        <span aria-hidden className="text-2xl text-muted-foreground">−</span>
-
         <div>
           <p className="flex items-center gap-1.5 text-xs uppercase tracking-wide text-muted-foreground">
             <TrendingDown className="size-3.5 text-gasto" />
@@ -64,8 +59,6 @@ export function EcuacionDelMes({
             {cantidadGastos} gasto{cantidadGastos === 1 ? "" : "s"}
           </p>
         </div>
-
-        <span aria-hidden className="text-2xl text-muted-foreground">=</span>
 
         <div className="ml-auto text-right">
           <p className="text-xs uppercase tracking-wide text-muted-foreground">
