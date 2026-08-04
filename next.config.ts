@@ -2,8 +2,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Por defecto tapa el pie del sidebar en desarrollo.
-  devIndicators: { position: "bottom-right" },
+  // Apagado: su lugar lo ocupa el botón de guía rápida de la app.
+  devIndicators: false,
 };
 
 export default nextConfig;

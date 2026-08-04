@@ -1,6 +1,7 @@
 // src/app/(app)/layout.tsx
 import { auth } from "@clerk/nextjs/server";
 import { AppSidebar } from "@/components/app-sidebar";
+import { GuiaRapida } from "@/components/guia-rapida";
 import { TransicionPagina } from "@/components/transicion-pagina";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 
@@ -23,6 +24,7 @@ export default async function AppLayout({
           <TransicionPagina>{children}</TransicionPagina>
         </div>
       </SidebarInset>
+      <GuiaRapida />
     </SidebarProvider>
   );
 }
