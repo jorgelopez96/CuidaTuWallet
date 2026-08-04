@@ -9,7 +9,10 @@ import {
   rangoDelMes,
   resumenMensual,
   total,
+  serieMensual,
   totalesPorTitular,
+  variacion,
+  ventanaDeMeses,
 } from "./resumen";
 
 assert.equal(total([]), 0);
@@ -89,5 +92,39 @@ assert.deepEqual(rangoDelMes(new Date(2028, 1, 3)), {
   desde: "2028-02-01",
   hasta: "2028-02-29",
 });
+
+// --- serie de los últimos meses -------------------------------------------
+// La ventana arranca el 1 del mes más viejo y termina el último día del actual.
+assert.deepEqual(ventanaDeMeses(new Date(2026, 7, 4), 6), {
+  desde: "2026-03-01",
+  hasta: "2026-08-31",
+});
+// Cruzando el año hacia atrás.
+assert.deepEqual(ventanaDeMeses(new Date(2026, 1, 10), 3), {
+  desde: "2025-12-01",
+  hasta: "2026-02-28",
+});
+
+const serie = serieMensual(
+  new Date(2026, 7, 4),
+  3,
+  [
+    { fecha: "2026-06-10", monto: 1000 },
+    { fecha: "2026-08-01", monto: 500 },
+  ],
+  [{ fecha: "2026-08-02", monto: 200 }],
+);
+assert.deepEqual(serie.map((m) => m.mes), ["2026-06", "2026-07", "2026-08"]);
+// Julio no tuvo movimientos y aun así aparece: sin eso el gráfico miente.
+assert.deepEqual(serie[1], { mes: "2026-07", cobrado: 0, gastado: 0, disponible: 0 });
+assert.deepEqual(serie[2], { mes: "2026-08", cobrado: 500, gastado: 200, disponible: 300 });
+
+// --- variación contra el mes anterior --------------------------------------
+assert.equal(variacion(120, 100), 20);
+assert.equal(variacion(80, 100), -20);
+// Sin base de comparación no hay porcentaje que mostrar.
+assert.equal(variacion(500, 0), null);
+// Con base negativa el signo sigue teniendo sentido.
+assert.equal(variacion(-50, -100), 50);
 
 console.info("resumen.ts ok");
