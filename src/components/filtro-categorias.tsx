@@ -72,7 +72,7 @@ export function FiltroCategorias({ gastos }: { gastos: Gasto[] }) {
         </CardHeader>
         <CardContent>
           {visibles.length ? (
-            <ListaGastos gastos={visibles} mostrarMedio />
+            <ListaGastos gastos={visibles} />
           ) : (
             <Vacio
               icono={ShoppingBasket}

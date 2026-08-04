@@ -7,7 +7,7 @@ import { totalesPorTitular } from "@/lib/resumen";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BorrarTarjeta } from "@/components/borrar-tarjeta";
 import { GastoForm } from "@/components/gasto-form";
-import { ListaGastos } from "@/components/lista-gastos";
+import { ListaCuotas } from "@/components/lista-cuotas";
 import { SubirResumen } from "@/components/subir-resumen";
 import { TotalesGastos } from "@/components/totales-gastos";
 
@@ -23,7 +23,7 @@ export default async function TarjetaDetallePage({
     supabase.from("tarjetas").select("*").eq("id", id).maybeSingle(),
     supabase
       .from("gastos")
-      .select("id, descripcion, categoria, monto, fecha, es_propio, medio_pago, cuota_actual, cuotas_total")
+      .select("id, descripcion, monto, fecha, fecha_compra, es_propio, cuota_actual, cuotas_total")
       .eq("tarjeta_id", id)
       .order("fecha", { ascending: false }),
   ]);
@@ -66,10 +66,9 @@ export default async function TarjetaDetallePage({
           </div>
         </CardHeader>
         <CardContent>
-          <ListaGastos
+          <ListaCuotas
             gastos={gastos.data ?? []}
-            mostrarTitular
-            vacio="Todavía no cargaste gastos en esta tarjeta."
+            tarjeta={`${marca} ·· ${ultimos4}`}
           />
         </CardContent>
       </Card>

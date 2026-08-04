@@ -3,6 +3,8 @@
 import assert from "node:assert/strict";
 import {
   agruparPorCategoria,
+  agruparPorDia,
+  faltaPagar,
   porCategoria,
   rangoDelMes,
   resumenMensual,
@@ -15,6 +17,15 @@ assert.equal(total([{ monto: "1500.50" }, { monto: 499.5 }]), 2000);
 
 const r = resumenMensual([{ monto: 100 }], [{ monto: 30 }, { monto: "10" }]);
 assert.deepEqual(r, { cobrado: 100, gastado: 40, disponible: 60 });
+
+// Cuota 4 de 12: quedan 8 por pagar.
+assert.equal(faltaPagar({ monto: 138400, cuota_actual: 4, cuotas_total: 12 }), 1107200);
+// La última cuota no deja nada pendiente.
+assert.equal(faltaPagar({ monto: 5000, cuota_actual: 6, cuotas_total: 6 }), 0);
+// Un gasto sin cuotas no tiene pendiente que mostrar.
+assert.equal(faltaPagar({ monto: 5000, cuota_actual: null, cuotas_total: null }), null);
+// Datos inconsistentes (cuota mayor al total) no devuelven negativo.
+assert.equal(faltaPagar({ monto: 5000, cuota_actual: 9, cuotas_total: 6 }), 0);
 
 assert.deepEqual(
   totalesPorTitular([
@@ -58,6 +69,16 @@ assert.equal(
   1,
 );
 assert.deepEqual(agruparPorCategoria([]), []);
+
+// Agrupa por día, del más reciente al más viejo, sin perder filas.
+const porDia = agruparPorDia([
+  { fecha: "2026-08-01", d: "a" },
+  { fecha: "2026-08-03", d: "b" },
+  { fecha: "2026-08-01", d: "c" },
+]);
+assert.deepEqual(porDia.map((g) => g.fecha), ["2026-08-03", "2026-08-01"]);
+assert.equal(porDia[1].gastos.length, 2);
+assert.deepEqual(agruparPorDia([]), []);
 
 // Diciembre: el mes siguiente rebalsa de año, y febrero bisiesto tiene 29.
 assert.deepEqual(rangoDelMes(new Date(2026, 11, 15)), {

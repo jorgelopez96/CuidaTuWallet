@@ -14,6 +14,21 @@ export function resumenMensual(ingresos: Monto[], gastos: Monto[]) {
   return { cobrado, gastado, disponible: cobrado - gastado };
 }
 
+export type EnCuotas = Monto & {
+  cuota_actual: number | null;
+  cuotas_total: number | null;
+};
+
+/**
+ * Lo que resta pagar de una compra en cuotas: las cuotas que faltan por el
+ * valor de cada una. Devuelve null si el gasto no está en cuotas, y 0 cuando
+ * se está pagando la última.
+ */
+export function faltaPagar({ monto, cuota_actual, cuotas_total }: EnCuotas): number | null {
+  if (!cuotas_total || !cuota_actual) return null;
+  return Math.max(0, cuotas_total - cuota_actual) * Number(monto);
+}
+
 /** Separa lo que gastaste vos de lo que gastó un tercero al que le prestaste la tarjeta. */
 export function totalesPorTitular(gastos: (Monto & { es_propio: boolean })[]) {
   return {
@@ -55,6 +70,19 @@ export function agruparPorCategoria<T extends { categoria?: string | null }>(
       categoria,
       gastos: gastos.filter((g) => (g.categoria?.trim() || "Otros") === categoria),
     }));
+}
+
+/**
+ * Agrupa por fecha, del día más reciente al más viejo. Espera las fechas en
+ * ISO (yyyy-mm-dd), que ordenan bien como texto.
+ */
+export function agruparPorDia<T extends { fecha: string }>(
+  gastos: T[],
+): { fecha: string; gastos: T[] }[] {
+  return [...new Set(gastos.map((g) => g.fecha))]
+    .sort()
+    .reverse()
+    .map((fecha) => ({ fecha, gastos: gastos.filter((g) => g.fecha === fecha) }));
 }
 
 /** Primer y último día del mes de `fecha`, en ISO (yyyy-mm-dd) para filtrar en Postgres. */
