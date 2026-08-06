@@ -2,7 +2,6 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { motion } from "motion/react";
 
 /**
  * Fade + slide corto al entrar a cada sección. La `key` es el pathname: al
@@ -16,14 +15,13 @@ export function TransicionPagina({ children }: { children: React.ReactNode }) {
   const desdeElCostado = pathname.startsWith("/perfil");
 
   return (
-    <motion.div
+    <div
       key={pathname}
-      initial={desdeElCostado ? { opacity: 0, x: "40%" } : { opacity: 0, y: 12 }}
-      animate={{ opacity: 1, x: 0, y: 0 }}
-      transition={{ duration: 0.25, ease: "easeOut" }}
-      className="flex flex-1 flex-col gap-6"
+      className={`flex flex-1 flex-col gap-6 ${
+        desdeElCostado ? "entra-desde-el-costado" : "entra-desde-abajo"
+      }`}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }

@@ -2,7 +2,6 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "motion/react";
 import { ArrowLeft, ArrowRight, HelpCircle } from "lucide-react";
 import { PASOS_GUIA } from "@/lib/pasos-guia";
 import { Button } from "@/components/ui/button";
@@ -48,13 +47,7 @@ export function GuiaRapida() {
           lo hace saltar de alto. El min-h fija el piso para que los botones no
           se muevan entre pasos.
         */}
-        <motion.div
-          key={paso}
-          initial={{ opacity: 0, x: 16 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.22, ease: "easeOut" }}
-          className="flex min-h-40 flex-col gap-3"
-        >
+        <div key={paso} className="entra-de-a-poco flex min-h-40 flex-col gap-3">
           <span className="flex size-11 items-center justify-center rounded-[14px] bg-primary/15 text-primary">
             <Icono className="size-5" />
           </span>
@@ -62,7 +55,7 @@ export function GuiaRapida() {
           <DialogDescription className="text-sm leading-relaxed">
             {detalle}
           </DialogDescription>
-        </motion.div>
+        </div>
 
         <div className="mt-2 flex items-center justify-between gap-4">
           <div className="flex gap-1.5" aria-hidden>

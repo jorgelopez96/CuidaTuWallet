@@ -133,47 +133,6 @@ export function serieMensual(
   });
 }
 
-export type CuotaProyectable = EnCuotas & { fecha: string };
-
-/**
- * Lo que ya está comprometido en cuotas, mes a mes, empezando por el actual.
- *
- * Mira hacia adelante y no hacia atrás a propósito: una cuenta recién creada no
- * tiene historial, pero sí tiene cuotas por pagar desde el primer resumen que
- * importás. Cada cuota que falta cae un mes después de la anterior.
- */
-export function proyeccionDeCuotas(
-  fecha: Date,
-  meses: number,
-  gastos: CuotaProyectable[],
-) {
-  const base = fecha.getFullYear() * 12 + fecha.getMonth();
-  const acumulado = new Map<number, number>();
-
-  for (const g of gastos) {
-    if (!g.cuotas_total || !g.cuota_actual) continue;
-
-    const [anio, mes] = g.fecha.split("-").map(Number);
-    const indice = anio * 12 + (mes - 1);
-    const restantes = g.cuotas_total - g.cuota_actual;
-
-    // k = 0 es la cuota de este resumen; de ahí en adelante, una por mes.
-    for (let k = 0; k <= restantes; k++) {
-      const offset = indice + k - base;
-      if (offset < 0 || offset >= meses) continue;
-      acumulado.set(offset, (acumulado.get(offset) ?? 0) + Number(g.monto));
-    }
-  }
-
-  return Array.from({ length: meses }, (_, i) => {
-    const cursor = new Date(fecha.getFullYear(), fecha.getMonth() + i, 1);
-    return {
-      mes: `${cursor.getFullYear()}-${dosDigitos(cursor.getMonth() + 1)}`,
-      monto: acumulado.get(i) ?? 0,
-    };
-  });
-}
-
 /**
  * Variación porcentual contra el mes anterior. Devuelve null cuando no hay
  * base de comparación: dividir por cero daría Infinity y "▲∞%" no dice nada.

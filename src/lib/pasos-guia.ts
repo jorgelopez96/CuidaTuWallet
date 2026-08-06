@@ -28,7 +28,7 @@ export const PASOS_GUIA: PasoGuia[] = [
     icono: LayoutDashboard,
     titulo: "Dashboard",
     detalle:
-      "Acá ves cuánto entró y cuánto gastaste este mes. El disponible se calcula restando todos los gastos —sueltos y de tarjeta— a tus ingresos. Los ingresos se cargan desde la sección Ingresos.",
+      "Acá ves cuánto entró y cuánto gastaste este mes. El disponible resta de tus ingresos los gastos que ya pagaste: un resumen de tarjeta cargado pero impago se ve en gris y todavía no descuenta, y lo que gastó un tercero con tu tarjeta no entra. Los ingresos se cargan desde la sección Ingresos.",
   },
   {
     icono: PiggyBank,
@@ -46,7 +46,7 @@ export const PASOS_GUIA: PasoGuia[] = [
     icono: CreditCard,
     titulo: "Tarjetas",
     detalle:
-      "Cargá tus tarjetas y entrá a cada una para ver sus gastos. Podés subir el PDF del resumen y que los consumos se carguen solos: se lee al vuelo y no se guarda en ningún lado. Marcá cuáles son tuyos y cuáles de terceros.",
+      "Cargá tus tarjetas y entrá a cada una para ver sus gastos. Podés subir el PDF del resumen y que los consumos se carguen solos: se lee al vuelo y no se guarda en ningún lado. Después tocá el chip de cada gasto para marcar cuáles son de terceros, y el botón del resumen cuando lo pagues.",
   },
   {
     icono: ShoppingBasket,

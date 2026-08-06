@@ -147,6 +147,63 @@
     @apply -translate-y-1 border-primary/60 shadow-lg shadow-primary/15;
   }
 
+  /* Animaciones en CSS y no en JS: corren en el compositor, sin ocupar el hilo
+     principal ni bajar una librería. En un celular de gama media es la
+     diferencia entre ir fluido y tironear. */
+
+  /* El gradiente del fondo solo deriva en escritorio: animar
+     `background-position` repinta la pantalla entera en cada cuadro, y eso es
+     lo que traba a un teléfono modesto. */
+  .fondo-gradiente {
+    background-size: 200% 200%;
+  }
+  @media (min-width: 768px) {
+    .fondo-gradiente {
+      animation: deriva-gradiente 18s ease-in-out infinite;
+    }
+  }
+  @keyframes deriva-gradiente {
+    0%, 100% { background-position: 0% 0%; }
+    50% { background-position: 100% 100%; }
+  }
+
+  /* Las manchas sí se mueven en todos lados: son `transform`, que la GPU
+     resuelve sola. Cada una trae su destino y su duración por variable. */
+  .mancha {
+    animation: deriva-mancha var(--dur) ease-in-out infinite alternate;
+    will-change: transform;
+  }
+  @keyframes deriva-mancha {
+    from { transform: translate(0, 0) scale(1); }
+    to { transform: translate(var(--dx), var(--dy)) scale(var(--esc)); }
+  }
+
+  /* Entrada de cada sección y de cada paso de la guía. */
+  .entra-desde-abajo { animation: entra-abajo 0.25s ease-out; }
+  .entra-desde-el-costado { animation: entra-costado 0.25s ease-out; }
+  .entra-de-a-poco { animation: entra-corto 0.22s ease-out; }
+
+  @keyframes entra-abajo {
+    from { opacity: 0; transform: translateY(12px); }
+  }
+  @keyframes entra-costado {
+    from { opacity: 0; transform: translateX(40%); }
+  }
+  @keyframes entra-corto {
+    from { opacity: 0; transform: translateX(16px); }
+  }
+
+  /* La dona se dibuja girando: cada porción aparece cuando le toca su lugar en
+     la vuelta, así el anillo se traza de una. `backwards` la deja invisible
+     durante su espera; el largo final lo pone el SVG. */
+  .porcion {
+    animation: dibuja-porcion var(--dur) ease backwards;
+    animation-delay: var(--espera);
+  }
+  @keyframes dibuja-porcion {
+    from { stroke-dasharray: 0 var(--vuelta); }
+  }
+
   /* Privacidad: el ojito pone `privado` en <html> y todo lo marcado como
      `monto` se difumina. Difuminar y no reemplazar por puntos mantiene el
      ancho: la ecuación no salta al ocultar. */

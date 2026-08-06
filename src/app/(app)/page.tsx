@@ -5,21 +5,18 @@ import { ingresosDeMes } from "@/lib/ingresos";
 import {
   mesDe,
   porCategoria,
-  proyeccionDeCuotas,
   rangoDelMes,
   serieMensual,
   variacion,
   ventanaDeMeses,
 } from "@/lib/resumen";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarrasMensuales } from "@/components/barras-mensuales";
 import { EcuacionDelMes } from "@/components/ecuacion-del-mes";
 import { GraficoGastos } from "@/components/grafico-gastos";
 import { MovimientosMensuales } from "@/components/movimientos-mensuales";
 
 /** Este mes y el anterior: lo justo para la comparación de la ecuación. */
 const MESES_COMPARADOS = 2;
-const MESES_PROYECTADOS = 6;
 
 export default async function DashboardPage() {
   const supabase = createServerSupabaseClient();
@@ -74,10 +71,6 @@ export default async function DashboardPage() {
   const gastosDelMes = delMes(gastos);
   const pagadosDelMes = gastosDelMes.filter((g) => g.pagado);
 
-  // Solo las cuotas de este mes: las de meses anteriores ya fueron reemplazadas
-  // por la fila del resumen siguiente y contarlas duplicaría el compromiso.
-  const proyeccion = proyeccionDeCuotas(hoy, MESES_PROYECTADOS, gastosDelMes);
-
   return (
     <>
       <h1 className="text-2xl font-semibold">Dashboard</h1>
@@ -92,28 +85,14 @@ export default async function DashboardPage() {
         mesAnterior={anterior?.mes}
       />
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Card className="elevable">
-          <CardHeader className="flex items-center justify-between gap-2">
-            <CardTitle>Lo que viene</CardTitle>
-            <span className="text-xs text-muted-foreground">
-              Cuánto pagás en cuotas, mes a mes
-            </span>
-          </CardHeader>
-          <CardContent>
-            <BarrasMensuales serie={proyeccion} />
-          </CardContent>
-        </Card>
-
-        <Card className="elevable">
-          <CardHeader>
-            <CardTitle>En qué se va</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <GraficoGastos datos={porCategoria(pagadosDelMes)} />
-          </CardContent>
-        </Card>
-      </div>
+      <Card className="elevable">
+        <CardHeader>
+          <CardTitle>En qué se va</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <GraficoGastos datos={porCategoria(pagadosDelMes)} />
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader className="flex items-center justify-between gap-2">
