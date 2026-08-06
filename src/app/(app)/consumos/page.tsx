@@ -1,8 +1,9 @@
 // src/app/(app)/consumos/page.tsx
-import { ShoppingBasket } from "lucide-react";
+import { Plus, ShoppingBasket } from "lucide-react";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { enPesos } from "@/lib/formato";
 import { rangoDelMes, total } from "@/lib/resumen";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { FiltroCategorias } from "@/components/filtro-categorias";
 import { GastoForm } from "@/components/gasto-form";
@@ -26,25 +27,44 @@ export default async function ConsumosPage() {
 
   return (
     <>
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold">Consumos</h1>
-          <p className="text-sm text-muted-foreground">
-            Este mes: {enPesos(total(data ?? []))}
-          </p>
-        </div>
-        <GastoForm />
+      <div>
+        <h1 className="text-2xl font-semibold">Consumos</h1>
+        <p className="text-sm text-muted-foreground">
+          Este mes: {enPesos(total(data ?? []))}
+        </p>
       </div>
 
       {data?.length ? (
-        <FiltroCategorias gastos={data} />
+        <>
+          <FiltroCategorias gastos={data} />
+
+          {/* Solo en escritorio: en mobile el alta vive en el botón central del
+              nav de abajo. Con la lista vacía tampoco se renderiza, porque el
+              botón del estado vacío ya cumple esa función. */}
+          <GastoForm>
+            <Button
+              size="icon"
+              aria-label="Cargar gasto"
+              className="fixed bottom-6 right-6 z-40 hidden size-14 rounded-full shadow-lg md:flex"
+            >
+              <Plus className="size-6" />
+            </Button>
+          </GastoForm>
+        </>
       ) : (
         <Card>
           <Vacio
             icono={ShoppingBasket}
-            titulo="Todavía no cargaste consumos este mes"
-            detalle="Verdulería, SUBE, Netflix: todo lo que pagás fuera de la tarjeta de crédito va acá."
-          />
+            titulo="Sin gastos registrados"
+            detalle="Registrá tus gastos para ver en qué estás gastando"
+          >
+            <GastoForm>
+              <Button>
+                <Plus />
+                Agregar
+              </Button>
+            </GastoForm>
+          </Vacio>
         </Card>
       )}
     </>

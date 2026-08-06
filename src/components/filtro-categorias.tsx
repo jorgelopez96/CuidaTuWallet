@@ -2,16 +2,53 @@
 "use client";
 
 import { useState } from "react";
+import { ShoppingBasket } from "lucide-react";
 import { enPesos } from "@/lib/formato";
 import { CATEGORIAS } from "@/lib/catalogos";
 import { estiloDeCategoria } from "@/components/categorias";
+import { CarruselInfinito } from "@/components/carrusel-infinito";
 import { ListaGastos, type Gasto } from "@/components/lista-gastos";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Vacio } from "@/components/vacio";
-import { ShoppingBasket } from "lucide-react";
 
 const totalDe = (gastos: Gasto[]) => gastos.reduce((t, g) => t + Number(g.monto), 0);
 const categoriaDe = (g: Gasto) => g.categoria?.trim() || "Otros";
+
+function Chip({
+  categoria,
+  total,
+  activa,
+  alTocar,
+}: {
+  categoria: string;
+  total: number;
+  activa: boolean;
+  alTocar: () => void;
+}) {
+  const { icono: Icono, color } = estiloDeCategoria(categoria);
+
+  return (
+    <button
+      type="button"
+      onClick={alTocar}
+      aria-pressed={activa}
+      // w-28 fijo: en el carrusel no hay grilla que le dé el ancho, y así
+      // todas miden lo mismo aunque el nombre sea largo.
+      className="flex w-28 flex-col items-center gap-1.5 rounded-2xl border-2 p-3 text-center transition-all duration-200 hover:-translate-y-0.5 md:w-auto"
+      style={{
+        borderColor: activa ? color : "transparent",
+        backgroundColor: `color-mix(in oklab, ${color} ${activa ? 22 : 10}%, transparent)`,
+        color,
+      }}
+    >
+      <Icono className="size-6" />
+      <span className="text-xs font-semibold leading-tight text-foreground">
+        {categoria}
+      </span>
+      <span className="text-xs font-bold tabular-nums">{enPesos(total)}</span>
+    </button>
+  );
+}
 
 /** Chips por categoría con su total. Tocás una y filtra; volvés a tocar y se apaga. */
 export function FiltroCategorias({ gastos }: { gastos: Gasto[] }) {
@@ -28,38 +65,24 @@ export function FiltroCategorias({ gastos }: { gastos: Gasto[] }) {
     ? gastos.filter((g) => elegidas.includes(categoriaDe(g)))
     : gastos;
 
+  // Los mismos chips en las dos vistas: el carrusel los repite, la grilla no.
+  const chips = CATEGORIAS.map((categoria) => (
+    <Chip
+      key={categoria}
+      categoria={categoria}
+      total={totalDe(gastos.filter((g) => categoriaDe(g) === categoria))}
+      activa={elegidas.includes(categoria)}
+      alTocar={() => alternar(categoria)}
+    />
+  ));
+
   return (
     <>
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        {CATEGORIAS.map((categoria) => {
-          const { icono: Icono, color } = estiloDeCategoria(categoria);
-          const suyos = gastos.filter((g) => categoriaDe(g) === categoria);
-          const activa = elegidas.includes(categoria);
-
-          return (
-            <button
-              key={categoria}
-              type="button"
-              onClick={() => alternar(categoria)}
-              aria-pressed={activa}
-              className="flex flex-col items-center gap-1.5 rounded-2xl border-2 p-3 text-center transition-all duration-200 hover:-translate-y-0.5"
-              style={{
-                borderColor: activa ? color : "transparent",
-                backgroundColor: `color-mix(in oklab, ${color} ${activa ? 22 : 10}%, transparent)`,
-                color,
-              }}
-            >
-              <Icono className="size-6" />
-              <span className="text-xs font-semibold leading-tight text-foreground">
-                {categoria}
-              </span>
-              <span className="text-xs font-bold tabular-nums">
-                {enPesos(totalDe(suyos))}
-              </span>
-            </button>
-          );
-        })}
+      {/* En mobile van en un carrusel sin fin; en escritorio entran las ocho. */}
+      <div className="md:hidden">
+        <CarruselInfinito>{chips}</CarruselInfinito>
       </div>
+      <div className="hidden gap-3 md:grid md:grid-cols-4">{chips}</div>
 
       <Card>
         <CardHeader className="flex flex-wrap items-center justify-between gap-2">

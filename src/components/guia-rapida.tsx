@@ -32,14 +32,12 @@ export function GuiaRapida() {
 
   return (
     <Dialog open={abierta} onOpenChange={abrir}>
+      {/* Vive en el header, no flotando: abajo a la derecha chocaba con el
+          botón de cargar gasto, y en mobile ahí va el nav. */}
       <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          size="icon"
-          aria-label="Abrir la guía de la app"
-          className="elevable fixed bottom-4 right-4 z-50 size-11 rounded-[14px] bg-card text-primary shadow-lg backdrop-blur-md"
-        >
-          <HelpCircle className="size-5" />
+        <Button variant="secondary" size="sm" className="rounded-full">
+          <HelpCircle />
+          Ayuda
         </Button>
       </DialogTrigger>
 

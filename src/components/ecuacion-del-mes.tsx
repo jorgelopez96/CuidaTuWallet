@@ -31,6 +31,8 @@ export function EcuacionDelMes({
 }) {
   return (
     <Card className="elevable">
+      {/* En mobile el disponible va primero y ocupa toda la fila, con Entró y
+          Salió abajo. En sm+ vuelve al orden del DOM y se alinea a la derecha. */}
       <CardContent className="flex flex-wrap items-center gap-x-8 gap-y-6">
         <div>
           <p className="flex items-center gap-1.5 text-xs uppercase tracking-wide text-muted-foreground">
@@ -60,7 +62,7 @@ export function EcuacionDelMes({
           </p>
         </div>
 
-        <div className="ml-auto text-right">
+        <div className="order-first w-full text-left sm:order-none sm:ml-auto sm:w-auto sm:text-right">
           <p className="text-xs uppercase tracking-wide text-muted-foreground">
             Disponible
           </p>

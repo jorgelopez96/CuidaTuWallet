@@ -1,24 +1,7 @@
 // src/app/(app)/perfil/page.tsx
-import { currentUser } from "@clerk/nextjs/server";
-import { PerfilForm } from "@/components/perfil-form";
+import { PerfilMenu } from "@/components/perfil-menu";
 
-export default async function PerfilPage() {
-  const user = await currentUser();
-  const nacimiento = user?.publicMetadata?.nacimiento;
-
-  return (
-    <>
-      <h1 className="text-2xl font-semibold">Perfil</h1>
-
-      <p className="text-sm text-muted-foreground">
-        {user?.primaryEmailAddress?.emailAddress}
-      </p>
-
-      <PerfilForm
-        nombre={user?.firstName ?? ""}
-        apellido={user?.lastName ?? ""}
-        nacimiento={typeof nacimiento === "string" ? nacimiento : ""}
-      />
-    </>
-  );
+/** El menú lee todo de Clerk en el cliente, así que acá no hay nada que traer. */
+export default function PerfilPage() {
+  return <PerfilMenu />;
 }

@@ -20,6 +20,7 @@ export function iniciales(nombre: string | null | undefined) {
   return (partes[0][0] + (partes.at(-1)![0] ?? "")).toUpperCase().slice(0, 2);
 }
 
+/** Pie del sidebar de escritorio. En mobile el acceso al perfil es [[SaludoPerfil]]. */
 export function UserMenu() {
   const { user } = useUser();
   const nombre = user?.fullName ?? user?.firstName ?? "";
