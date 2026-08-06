@@ -7,6 +7,7 @@ import { Vacio } from "@/components/vacio";
 import { TotalesGastos } from "@/components/totales-gastos";
 import { TarjetaForm } from "@/components/tarjeta-form";
 import { TarjetaVisual } from "@/components/tarjeta-visual";
+import { CarruselTarjetas } from "@/components/carrusel-tarjetas";
 
 export default async function TarjetasPage() {
   const supabase = createServerSupabaseClient();
@@ -45,19 +46,35 @@ export default async function TarjetasPage() {
 
       <TotalesGastos propios={propios} ajenos={ajenos} />
 
-      {/* auto-fill: las tarjetas rondan los 272-340px y entran las que quepan.
-          En pantallas angostas minmax cae a 100% y quedan una debajo de otra. */}
       {data?.length ? (
-        <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(min(100%,17rem),1fr))]">
-          {data.map((t) => (
-            <TarjetaVisual
-              key={t.id}
-              tarjeta={t}
-              gastado={porTarjeta.get(t.id)?.gastado ?? 0}
-              cantidad={porTarjeta.get(t.id)?.cantidad ?? 0}
-            />
-          ))}
-        </div>
+        <>
+          {/* Mobile: carrusel. El scroll horizontal resuelve el apilado. */}
+          <div className="md:hidden">
+            <CarruselTarjetas>
+              {data.map((t) => (
+                <TarjetaVisual
+                  key={t.id}
+                  tarjeta={t}
+                  gastado={porTarjeta.get(t.id)?.gastado ?? 0}
+                  cantidad={porTarjeta.get(t.id)?.cantidad ?? 0}
+                />
+              ))}
+            </CarruselTarjetas>
+          </div>
+
+          {/* Desktop: auto-fill, las tarjetas rondan los 272-340px y entran las
+              que quepan. */}
+          <div className="hidden gap-4 md:grid [grid-template-columns:repeat(auto-fill,minmax(17rem,1fr))]">
+            {data.map((t) => (
+              <TarjetaVisual
+                key={t.id}
+                tarjeta={t}
+                gastado={porTarjeta.get(t.id)?.gastado ?? 0}
+                cantidad={porTarjeta.get(t.id)?.cantidad ?? 0}
+              />
+            ))}
+          </div>
+        </>
       ) : (
         <Card>
           <Vacio

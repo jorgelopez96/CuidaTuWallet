@@ -58,7 +58,9 @@ export function TarjetaVisual({
 
       <div className="relative mt-auto flex items-end justify-between gap-4">
         <div>
-          <p className="text-xs text-white/60">
+          {/* nowrap: el div lo dimensiona el monto de abajo, y sin esto la
+              etiqueta se parte en dos líneas y estira la tarjeta. */}
+          <p className="whitespace-nowrap text-xs text-white/60">
             Este mes · {cantidad} gasto{cantidad === 1 ? "" : "s"}
           </p>
           <p className="text-xl font-bold tabular-nums">{enPesos(gastado)}</p>

@@ -3,6 +3,7 @@ import {
   CalendarClock,
   CreditCard,
   LayoutDashboard,
+  PiggyBank,
   ShoppingBasket,
   User,
   Wallet,
@@ -25,15 +26,21 @@ export const PASOS_GUIA: PasoGuia[] = [
   },
   {
     icono: LayoutDashboard,
-    titulo: "Inicio",
+    titulo: "Dashboard",
     detalle:
-      "Acá ves cuánto entró y cuánto gastaste este mes. El disponible se calcula restando todos los gastos —sueltos y de tarjeta— a tus ingresos. Cargá tu sueldo o una venta con el botón de arriba a la derecha.",
+      "Acá ves cuánto entró y cuánto gastaste este mes. El disponible se calcula restando todos los gastos —sueltos y de tarjeta— a tus ingresos. Los ingresos se cargan desde la sección Ingresos.",
+  },
+  {
+    icono: PiggyBank,
+    titulo: "Ingresos",
+    detalle:
+      "Cargá tu sueldo, un alquiler que cobrás o una venta suelta. Si se repite todos los meses, tildá la opción y cuenta solo hasta que lo des de baja. Los que se cierran quedan en el historial.",
   },
   {
     icono: CalendarClock,
     titulo: "Lo que viene",
     detalle:
-      "El gráfico del Inicio proyecta las cuotas que ya tenés comprometidas, de este mes en adelante. Sirve para saber con cuánto vas a contar dentro de tres meses, no solo hoy.",
+      "El gráfico del Dashboard proyecta las cuotas que ya tenés comprometidas, de este mes en adelante. Sirve para saber con cuánto vas a contar dentro de tres meses, no solo hoy.",
   },
   {
     icono: CreditCard,

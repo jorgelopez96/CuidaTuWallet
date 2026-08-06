@@ -4,7 +4,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CreditCard, LayoutDashboard, ShoppingBasket } from "lucide-react";
+import { CreditCard, LayoutDashboard, PiggyBank, ShoppingBasket } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { UserMenu } from "@/components/user-menu";
 import {
@@ -21,8 +21,9 @@ import {
 
 // Perfil no va acá: se entra desde el menú del usuario, en el pie.
 const secciones = [
-  { href: "/", label: "Inicio", icon: LayoutDashboard, color: "text-chart-1" },
-  { href: "/tarjetas", label: "Tarjetas", icon: CreditCard, color: "text-chart-2" },
+  { href: "/", label: "Dashboard", icon: LayoutDashboard, color: "text-chart-1" },
+  { href: "/ingresos", label: "Ingresos", icon: PiggyBank, color: "text-chart-2" },
+  { href: "/tarjetas", label: "Tarjetas", icon: CreditCard, color: "text-chart-4" },
   { href: "/consumos", label: "Consumos", icon: ShoppingBasket, color: "text-chart-3" },
 ];
 

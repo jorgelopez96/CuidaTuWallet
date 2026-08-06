@@ -110,8 +110,8 @@ const serie = serieMensual(
   new Date(2026, 7, 4),
   3,
   [
-    { fecha: "2026-06-10", monto: 1000 },
-    { fecha: "2026-08-01", monto: 500 },
+    { fecha: "2026-06-10", monto: 1000, recurrente: false, baja_el: null },
+    { fecha: "2026-08-01", monto: 500, recurrente: false, baja_el: null },
   ],
   [{ fecha: "2026-08-02", monto: 200 }],
 );
@@ -119,6 +119,24 @@ assert.deepEqual(serie.map((m) => m.mes), ["2026-06", "2026-07", "2026-08"]);
 // Julio no tuvo movimientos y aun así aparece: sin eso el gráfico miente.
 assert.deepEqual(serie[1], { mes: "2026-07", cobrado: 0, gastado: 0, disponible: 0 });
 assert.deepEqual(serie[2], { mes: "2026-08", cobrado: 500, gastado: 200, disponible: 300 });
+
+// Un sueldo recurrente suma en todos los meses de la serie, con una sola fila.
+const conSueldo = serieMensual(
+  new Date(2026, 7, 4),
+  3,
+  [{ fecha: "2026-01-05", monto: 800, recurrente: true, baja_el: null }],
+  [],
+);
+assert.deepEqual(conSueldo.map((m) => m.cobrado), [800, 800, 800]);
+
+// Y deja de sumar a partir del mes siguiente al de su baja.
+const conBaja = serieMensual(
+  new Date(2026, 7, 4),
+  3,
+  [{ fecha: "2026-01-05", monto: 800, recurrente: true, baja_el: "2026-07-31" }],
+  [],
+);
+assert.deepEqual(conBaja.map((m) => m.cobrado), [800, 800, 0]);
 
 // --- variación contra el mes anterior --------------------------------------
 assert.equal(variacion(120, 100), 20);

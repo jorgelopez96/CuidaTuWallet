@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint src",
-    "test": "tsx src/lib/monto.test.ts && tsx src/lib/resumen.test.ts && tsx src/lib/resumen-parser.test.ts"
+    "test": "tsx src/lib/monto.test.ts && tsx src/lib/resumen.test.ts && tsx src/lib/resumen-parser.test.ts && tsx src/lib/ingresos.test.ts"
   },
   "dependencies": {
     "@clerk/localizations": "^4.13.10",

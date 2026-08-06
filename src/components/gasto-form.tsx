@@ -30,18 +30,30 @@ const hoy = () => new Date().toISOString().slice(0, 10);
 // Crédito no está: ese gasto se carga desde el detalle de su tarjeta.
 const MEDIOS_SUELTOS = MEDIOS.filter((m) => m !== "credito");
 
-/** Con `tarjetaId` el gasto es de crédito: suma cuotas y propio/ajeno. */
-export function GastoForm({ tarjetaId }: { tarjetaId?: string }) {
+/**
+ * Con `tarjetaId` el gasto es de crédito: suma cuotas y propio/ajeno.
+ * `children` reemplaza el botón que abre el diálogo, para el flotante y el del
+ * estado vacío. Tiene que ser un único elemento: lo exige `DialogTrigger asChild`.
+ */
+export function GastoForm({
+  tarjetaId,
+  children,
+}: {
+  tarjetaId?: string;
+  children?: React.ReactNode;
+}) {
   const { abierto, setAbierto, estado, enviar, pendiente } =
     useFormDialog(crearGasto);
 
   return (
     <Dialog open={abierto} onOpenChange={setAbierto}>
       <DialogTrigger asChild>
-        <Button>
-          <Plus />
-          Cargar gasto
-        </Button>
+        {children ?? (
+          <Button>
+            <Plus />
+            Cargar gasto
+          </Button>
+        )}
       </DialogTrigger>
 
       <DialogContent className="max-h-[85vh] overflow-y-auto">

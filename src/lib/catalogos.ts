@@ -25,6 +25,10 @@ export const CATEGORIAS = [
   "Suscripciones",
   "Supermercado",
   "Transporte",
+  "Servicios",
+  "Entretenimiento",
+  "Educación",
+  "Salud",
   "Otros",
 ] as const;
 

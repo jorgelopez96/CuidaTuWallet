@@ -2,10 +2,12 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { PiggyBank, Trash2 } from "lucide-react";
-import { borrarIngreso } from "@/app/(app)/_actions/ingresos";
+import { CalendarOff, PiggyBank, Trash2 } from "lucide-react";
+import { borrarIngreso, darDeBajaIngreso } from "@/app/(app)/_actions/ingresos";
 import { enPesos } from "@/lib/formato";
+import type { Ingreso } from "@/lib/ingresos";
 import { Vacio } from "@/components/vacio";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -16,14 +18,15 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-export type Ingreso = {
-  id: string;
-  concepto: string;
-  monto: number | string;
-  fecha: string;
-};
+const enDia = (iso: string) => iso.split("-").reverse().join("/");
 
-export function ListaIngresos({ ingresos }: { ingresos: Ingreso[] }) {
+export function ListaIngresos({
+  ingresos,
+  vacio = "Todavía no cargaste ingresos",
+}: {
+  ingresos: Ingreso[];
+  vacio?: string;
+}) {
   const [pendiente, iniciar] = useTransition();
   const [error, setError] = useState<string>();
 
@@ -31,8 +34,8 @@ export function ListaIngresos({ ingresos }: { ingresos: Ingreso[] }) {
     return (
       <Vacio
         icono={PiggyBank}
-        titulo="Todavía no cargaste ingresos"
-        detalle="Cargá tu sueldo o una venta con el botón de arriba y el disponible se calcula solo."
+        titulo={vacio}
+        detalle="Cargá tu sueldo o una venta y el disponible se calcula solo."
       />
     );
   }
@@ -50,33 +53,56 @@ export function ListaIngresos({ ingresos }: { ingresos: Ingreso[] }) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {ingresos.map(({ id, concepto, monto, fecha }) => (
-            <TableRow key={id}>
-              <TableCell className="font-medium">{concepto}</TableCell>
-              <TableCell className="text-muted-foreground">
-                {fecha.split("-").reverse().join("/")}
-              </TableCell>
-              <TableCell className="text-right tabular-nums text-ingreso">
-                {enPesos(Number(monto))}
-              </TableCell>
-              <TableCell>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  aria-label={`Borrar ${concepto}`}
-                  disabled={pendiente}
-                  onClick={() =>
-                    iniciar(async () => {
-                      const r = await borrarIngreso(id);
-                      setError(r.error);
-                    })
-                  }
-                >
-                  <Trash2 className="text-gasto" />
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
+          {ingresos.map(({ id, concepto, monto, fecha, recurrente, baja_el }) => {
+            // Solo un recurrente todavía abierto se da de baja; el resto se borra.
+            const puedeDarseDeBaja = recurrente && !baja_el;
+
+            return (
+              <TableRow key={id}>
+                <TableCell className="font-medium">
+                  <span className="flex items-center gap-2">
+                    {concepto}
+                    {recurrente && (
+                      <Badge variant="secondary" className="font-normal">
+                        Mensual
+                      </Badge>
+                    )}
+                  </span>
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  {baja_el ? `hasta ${enDia(baja_el)}` : enDia(fecha)}
+                </TableCell>
+                <TableCell className="text-right tabular-nums text-ingreso">
+                  {enPesos(Number(monto))}
+                </TableCell>
+                <TableCell>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label={
+                      puedeDarseDeBaja ? `Dar de baja ${concepto}` : `Borrar ${concepto}`
+                    }
+                    title={puedeDarseDeBaja ? "Dar de baja" : "Borrar"}
+                    disabled={pendiente}
+                    onClick={() =>
+                      iniciar(async () => {
+                        const r = puedeDarseDeBaja
+                          ? await darDeBajaIngreso(id)
+                          : await borrarIngreso(id);
+                        setError(r.error);
+                      })
+                    }
+                  >
+                    {puedeDarseDeBaja ? (
+                      <CalendarOff className="text-muted-foreground" />
+                    ) : (
+                      <Trash2 className="text-gasto" />
+                    )}
+                  </Button>
+                </TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
     </>

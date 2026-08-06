@@ -19,7 +19,7 @@ import { Label } from "@/components/ui/label";
 
 const hoy = () => new Date().toISOString().slice(0, 10);
 
-export function IngresoForm() {
+export function IngresoForm({ etiqueta = "Cargar ingreso" }: { etiqueta?: string }) {
   const { abierto, setAbierto, estado, enviar, pendiente } =
     useFormDialog(crearIngreso);
 
@@ -28,7 +28,7 @@ export function IngresoForm() {
       <DialogTrigger asChild>
         <Button>
           <Plus />
-          Cargar ingreso
+          {etiqueta}
         </Button>
       </DialogTrigger>
 
@@ -52,6 +52,22 @@ export function IngresoForm() {
             <Label htmlFor="fecha">Fecha</Label>
             <Input id="fecha" name="fecha" type="date" defaultValue={hoy()} required />
           </div>
+
+          <label className="flex items-start gap-3 rounded-lg border p-3">
+            <input
+              type="checkbox"
+              name="recurrente"
+              value="si"
+              className="mt-0.5 size-4 accent-[var(--ingreso)]"
+            />
+            <span>
+              <span className="text-sm font-medium">Se repite todos los meses</span>
+              <span className="block text-xs text-muted-foreground">
+                Un sueldo o un alquiler que cobrás. Cuenta cada mes hasta que lo
+                des de baja.
+              </span>
+            </span>
+          </label>
 
           {estado.error && <p className="text-sm text-gasto">{estado.error}</p>}
 

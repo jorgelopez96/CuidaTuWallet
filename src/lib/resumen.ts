@@ -1,6 +1,7 @@
 // src/lib/resumen.ts
 
 import { CATEGORIAS } from "@/lib/catalogos";
+import { vigenteEnMes, type Vigencia } from "@/lib/ingresos";
 
 export type Monto = { monto: number | string };
 
@@ -114,7 +115,7 @@ export type ConFecha = Monto & { fecha: string };
 export function serieMensual(
   fecha: Date,
   meses: number,
-  ingresos: ConFecha[],
+  ingresos: (Monto & Vigencia)[],
   gastos: ConFecha[],
 ) {
   const y = fecha.getFullYear();
@@ -123,10 +124,11 @@ export function serieMensual(
   return Array.from({ length: meses }, (_, i) => {
     const cursor = new Date(y, m - (meses - 1) + i, 1);
     const clave = `${cursor.getFullYear()}-${dosDigitos(cursor.getMonth() + 1)}`;
-    const delMes = <T extends ConFecha>(xs: T[]) => xs.filter((x) => mesDe(x.fecha) === clave);
 
-    const cobrado = total(delMes(ingresos));
-    const gastado = total(delMes(gastos));
+    // Los ingresos se filtran por vigencia y no por fecha: un sueldo recurrente
+    // es una sola fila que impacta todos los meses entre su alta y su baja.
+    const cobrado = total(ingresos.filter((ing) => vigenteEnMes(ing, clave)));
+    const gastado = total(gastos.filter((g) => mesDe(g.fecha) === clave));
     return { mes: clave, cobrado, gastado, disponible: cobrado - gastado };
   });
 }

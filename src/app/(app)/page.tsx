@@ -1,7 +1,9 @@
 // src/app/(app)/page.tsx
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { enPesos } from "@/lib/formato";
+import { ingresosDeMes } from "@/lib/ingresos";
 import {
+  mesDe,
   porCategoria,
   proyeccionDeCuotas,
   rangoDelMes,
@@ -13,35 +15,36 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarrasMensuales } from "@/components/barras-mensuales";
 import { EcuacionDelMes } from "@/components/ecuacion-del-mes";
 import { GraficoGastos } from "@/components/grafico-gastos";
-import { IngresoForm } from "@/components/ingreso-form";
-import { ListaIngresos } from "@/components/lista-ingresos";
+import { MovimientosMensuales } from "@/components/movimientos-mensuales";
 
 /** Este mes y el anterior: lo justo para la comparación de la ecuación. */
 const MESES_COMPARADOS = 2;
 const MESES_PROYECTADOS = 6;
 
-export default async function InicioPage() {
+export default async function DashboardPage() {
   const supabase = createServerSupabaseClient();
   const hoy = new Date();
   const { desde, hasta } = ventanaDeMeses(hoy, MESES_COMPARADOS);
   const mesActual = rangoDelMes(hoy);
 
-  const [ing, gas] = await Promise.all([
+  const [ing, gas, tar] = await Promise.all([
     supabase
       .from("ingresos")
-      .select("id, concepto, monto, fecha")
-      .gte("fecha", desde)
-      .lte("fecha", hasta)
+      .select("id, concepto, monto, fecha, recurrente, baja_el")
+      .or(`recurrente.eq.true,and(fecha.gte.${desde},fecha.lte.${hasta})`)
       .order("fecha", { ascending: false }),
     supabase
       .from("gastos")
-      .select("monto, categoria, fecha, cuota_actual, cuotas_total")
+      .select(
+        "id, descripcion, monto, categoria, fecha, tarjeta_id, cuota_actual, cuotas_total",
+      )
       .gte("fecha", desde)
       .lte("fecha", hasta),
+    supabase.from("tarjetas").select("id, marca, banco, ultimos4"),
   ]);
 
   // Sin esto, un fallo de RLS o de red se vería como "$ 0" y parecería un mes sin movimientos.
-  const falla = ing.error ?? gas.error;
+  const falla = ing.error ?? gas.error ?? tar.error;
   if (falla) throw new Error(`No se pudieron leer los movimientos: ${falla.message}`);
 
   const ingresos = ing.data ?? [];
@@ -55,7 +58,9 @@ export default async function InicioPage() {
   const delMes = <T extends { fecha: string }>(xs: T[]) =>
     xs.filter((x) => x.fecha >= mesActual.desde && x.fecha <= mesActual.hasta);
 
-  const ingresosDelMes = delMes(ingresos);
+  // Los ingresos no se filtran por fecha: un recurrente es una sola fila vieja
+  // que igual impacta este mes.
+  const ingresosDelMes = ingresosDeMes(ingresos, mesDe(mesActual.desde));
   const gastosDelMes = delMes(gastos);
 
   // Solo las cuotas de este mes: las de meses anteriores ya fueron reemplazadas
@@ -64,10 +69,7 @@ export default async function InicioPage() {
 
   return (
     <>
-      <div className="flex items-center justify-between gap-4">
-        <h1 className="text-2xl font-semibold">Inicio</h1>
-        <IngresoForm />
-      </div>
+      <h1 className="text-2xl font-semibold">Dashboard</h1>
 
       <EcuacionDelMes
         cobrado={actual.cobrado}
@@ -104,13 +106,21 @@ export default async function InicioPage() {
 
       <Card>
         <CardHeader className="flex items-center justify-between gap-2">
-          <CardTitle>Ingresos del mes</CardTitle>
-          <span className="tabular-nums text-muted-foreground">
-            {enPesos(actual.cobrado)}
+          <CardTitle>Movimientos mensuales</CardTitle>
+          <span
+            className={`font-semibold tabular-nums ${
+              actual.disponible < 0 ? "text-gasto" : "text-ingreso"
+            }`}
+          >
+            {actual.disponible < 0 ? "−" : "+"} {enPesos(Math.abs(actual.disponible))}
           </span>
         </CardHeader>
         <CardContent>
-          <ListaIngresos ingresos={ingresosDelMes} />
+          <MovimientosMensuales
+            ingresos={ingresosDelMes}
+            gastos={gastosDelMes}
+            tarjetas={tar.data ?? []}
+          />
         </CardContent>
       </Card>
     </>

@@ -3,8 +3,8 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EsqueletoCard, EsqueletoTitulo } from "@/components/esqueleto";
 
-/** Carga del Inicio: la ecuación, los dos gráficos y la lista de ingresos. */
-export default function CargandoInicio() {
+/** Carga del Dashboard: la ecuación, los dos gráficos y la lista de ingresos. */
+export default function CargandoDashboard() {
   return (
     <div className="flex flex-1 flex-col gap-6">
       <EsqueletoTitulo />
@@ -57,7 +57,7 @@ export default function CargandoInicio() {
         </Card>
       </div>
 
-      <EsqueletoCard filas={3} tono="ingreso" />
+      <EsqueletoCard filas={5} tono="neutro" />
     </div>
   );
 }
