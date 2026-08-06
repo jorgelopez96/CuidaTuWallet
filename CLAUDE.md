@@ -38,9 +38,14 @@ en un botón central elevado, y el sidebar oculto.
    manualmente o subiendo el resumen. Necesito una regla que lea el resumen y
    cargue los gastos automáticamente. Los resúmenes NO se guardan en ningún
    lado, solo se leen para extraer los gastos (esto debe estar aclarado en la UI).
-   Cada gasto de tarjeta debe poder marcarse como propio o ajeno (préstamo de
-   tarjeta a terceros), mostrando el total de cada uno por separado. Opción de
-   borrar tarjetas con doble confirmación.
+   Los gastos importados entran todos como propios y sin pagar; cada uno se
+   pasa a "de un tercero" (préstamo de tarjeta) con un click en su chip, y el
+   detalle muestra el total de cada uno por separado. Lo de terceros queda
+   registrado solo acá: no es plata propia, así que no aparece en el dashboard
+   ni descuenta del disponible. Los gastos se agrupan por
+   vencimiento —eso es un resumen— y cada resumen se marca pagado entero:
+   mientras esté impago se ve en el dashboard pero no descuenta del disponible.
+   Opción de borrar tarjetas con doble confirmación.
 4. **Consumos**: carga de gastos sueltos — carnicería, verdulería,
    suscripciones (Netflix, Spotify, etc.), transporte (SUBE, Uber) — que también
    descuentan del dinero disponible. Ocho categorías: Suscripciones,

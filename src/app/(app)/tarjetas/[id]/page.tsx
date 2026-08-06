@@ -23,7 +23,9 @@ export default async function TarjetaDetallePage({
     supabase.from("tarjetas").select("*").eq("id", id).maybeSingle(),
     supabase
       .from("gastos")
-      .select("id, descripcion, monto, fecha, fecha_compra, es_propio, cuota_actual, cuotas_total")
+      .select(
+        "id, descripcion, monto, fecha, fecha_compra, es_propio, pagado, cuota_actual, cuotas_total",
+      )
       .eq("tarjeta_id", id)
       .order("fecha", { ascending: false }),
   ]);
@@ -67,6 +69,7 @@ export default async function TarjetaDetallePage({
         </CardHeader>
         <CardContent>
           <ListaCuotas
+            tarjetaId={id}
             gastos={gastos.data ?? []}
             tarjeta={`${marca} ·· ${ultimos4}`}
           />

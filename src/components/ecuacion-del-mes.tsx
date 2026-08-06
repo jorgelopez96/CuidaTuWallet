@@ -2,6 +2,7 @@
 import { TrendingDown, TrendingUp } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { MontoAnimado } from "@/components/monto-animado";
+import { OjoPrivacidad } from "@/components/ojo-privacidad";
 
 const MESES = [
   "enero", "febrero", "marzo", "abril", "mayo", "junio",
@@ -41,7 +42,7 @@ export function EcuacionDelMes({
           </p>
           <MontoAnimado
             valor={cobrado}
-            className="block text-2xl font-semibold text-ingreso"
+            className="monto block text-2xl font-semibold text-ingreso"
           />
           <p className="text-xs text-muted-foreground">
             {cantidadIngresos} ingreso{cantidadIngresos === 1 ? "" : "s"}
@@ -55,7 +56,7 @@ export function EcuacionDelMes({
           </p>
           <MontoAnimado
             valor={gastado}
-            className="block text-2xl font-semibold text-gasto"
+            className="monto block text-2xl font-semibold text-gasto"
           />
           <p className="text-xs text-muted-foreground">
             {cantidadGastos} gasto{cantidadGastos === 1 ? "" : "s"}
@@ -63,12 +64,13 @@ export function EcuacionDelMes({
         </div>
 
         <div className="order-first w-full text-left sm:order-none sm:ml-auto sm:w-auto sm:text-right">
-          <p className="text-xs uppercase tracking-wide text-muted-foreground">
+          <p className="flex items-center gap-1 text-xs uppercase tracking-wide text-muted-foreground sm:justify-end">
             Disponible
+            <OjoPrivacidad />
           </p>
           <MontoAnimado
             valor={disponible}
-            className="block text-4xl font-bold tracking-tight"
+            className="monto block text-4xl font-bold tracking-tight"
           />
           {cambio !== null && mesAnterior && (
             <span

@@ -36,7 +36,7 @@ export default async function DashboardPage() {
     supabase
       .from("gastos")
       .select(
-        "id, descripcion, monto, categoria, fecha, tarjeta_id, cuota_actual, cuotas_total",
+        "id, descripcion, monto, categoria, fecha, tarjeta_id, es_propio, pagado, cuota_actual, cuotas_total",
       )
       .gte("fecha", desde)
       .lte("fecha", hasta),
@@ -48,9 +48,19 @@ export default async function DashboardPage() {
   if (falla) throw new Error(`No se pudieron leer los movimientos: ${falla.message}`);
 
   const ingresos = ing.data ?? [];
-  const gastos = gas.data ?? [];
 
-  const serie = serieMensual(hoy, MESES_COMPARADOS, ingresos, gastos);
+  // El dashboard es la plata tuya: lo que gastó un tercero al que le prestaste
+  // la tarjeta queda registrado en la tarjeta, pero acá no entra por ningún lado.
+  const gastos = (gas.data ?? []).filter((g) => g.es_propio);
+
+  // Un resumen de tarjeta cargado pero impago todavía no salió de la cuenta:
+  // se ve en los movimientos, pero no entra en la plata que se fue.
+  const serie = serieMensual(
+    hoy,
+    MESES_COMPARADOS,
+    ingresos,
+    gastos.filter((g) => g.pagado),
+  );
   const actual = serie[serie.length - 1];
   const anterior = serie[serie.length - 2];
   const cambio = variacion(actual.disponible, anterior?.disponible ?? 0);
@@ -62,6 +72,7 @@ export default async function DashboardPage() {
   // que igual impacta este mes.
   const ingresosDelMes = ingresosDeMes(ingresos, mesDe(mesActual.desde));
   const gastosDelMes = delMes(gastos);
+  const pagadosDelMes = gastosDelMes.filter((g) => g.pagado);
 
   // Solo las cuotas de este mes: las de meses anteriores ya fueron reemplazadas
   // por la fila del resumen siguiente y contarlas duplicaría el compromiso.
@@ -76,7 +87,7 @@ export default async function DashboardPage() {
         gastado={actual.gastado}
         disponible={actual.disponible}
         cantidadIngresos={ingresosDelMes.length}
-        cantidadGastos={gastosDelMes.length}
+        cantidadGastos={pagadosDelMes.length}
         cambio={cambio}
         mesAnterior={anterior?.mes}
       />
@@ -99,7 +110,7 @@ export default async function DashboardPage() {
             <CardTitle>En qué se va</CardTitle>
           </CardHeader>
           <CardContent>
-            <GraficoGastos datos={porCategoria(gastosDelMes)} />
+            <GraficoGastos datos={porCategoria(pagadosDelMes)} />
           </CardContent>
         </Card>
       </div>
@@ -108,7 +119,7 @@ export default async function DashboardPage() {
         <CardHeader className="flex items-center justify-between gap-2">
           <CardTitle>Movimientos mensuales</CardTitle>
           <span
-            className={`font-semibold tabular-nums ${
+            className={`monto font-semibold tabular-nums ${
               actual.disponible < 0 ? "text-gasto" : "text-ingreso"
             }`}
           >

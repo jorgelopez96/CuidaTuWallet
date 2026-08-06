@@ -146,6 +146,16 @@
   .elevable:hover {
     @apply -translate-y-1 border-primary/60 shadow-lg shadow-primary/15;
   }
+
+  /* Privacidad: el ojito pone `privado` en <html> y todo lo marcado como
+     `monto` se difumina. Difuminar y no reemplazar por puntos mantiene el
+     ancho: la ecuación no salta al ocultar. */
+  .monto {
+    @apply transition-[filter] duration-200;
+  }
+  .privado .monto {
+    @apply select-none blur-[6px];
+  }
 }
 
 @layer base {

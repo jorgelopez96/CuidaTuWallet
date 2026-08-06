@@ -2,7 +2,6 @@
 "use client";
 
 import { motion } from "motion/react";
-import { enPesos } from "@/lib/formato";
 
 const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
 
@@ -41,7 +40,7 @@ export function BarrasMensuales({
 
         return (
           <div key={mes} className="flex h-full flex-1 flex-col items-center gap-2">
-            <span className="text-xs tabular-nums text-muted-foreground">
+            <span className="monto text-xs tabular-nums text-muted-foreground">
               {monto === 0 ? "—" : abreviado(monto)}
             </span>
 
@@ -53,7 +52,6 @@ export function BarrasMensuales({
                 initial={{ height: 0 }}
                 animate={{ height: `${alto}%` }}
                 transition={{ duration: 0.5, delay: i * 0.06, ease: "easeOut" }}
-                title={enPesos(monto)}
               />
             </div>
 

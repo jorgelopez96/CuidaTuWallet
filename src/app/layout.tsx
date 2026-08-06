@@ -34,6 +34,14 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${nunito.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        {/* Antes de pintar, para que los montos no se vean un instante. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{localStorage.getItem("cuidatuwallet:montos-ocultos")==="1"&&document.documentElement.classList.add("privado")}catch{}`,
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col">
         <ThemeProvider attribute="class" defaultTheme="dark">
           <FondoAnimado />

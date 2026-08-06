@@ -39,7 +39,7 @@ export function GraficoGastos({ datos }: { datos: Dato[] }) {
       {/* El total va como HTML encima del SVG: el <Label> de Recharts no rinde. */}
       <div className="relative">
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-lg font-semibold tabular-nums">{enPesos(total)}</span>
+          <span className="monto text-lg font-semibold tabular-nums">{enPesos(total)}</span>
           <span className="text-xs text-muted-foreground">este mes</span>
         </div>
 
@@ -49,7 +49,9 @@ export function GraficoGastos({ datos }: { datos: Dato[] }) {
             content={
               <ChartTooltipContent
                 nameKey="categoria"
-                formatter={(valor) => enPesos(Number(valor))}
+                formatter={(valor) => (
+                  <span className="monto">{enPesos(Number(valor))}</span>
+                )}
               />
             }
           />
@@ -74,7 +76,7 @@ export function GraficoGastos({ datos }: { datos: Dato[] }) {
               style={{ backgroundColor: estiloDeCategoria(categoria).color }}
             />
             <span className="flex-1 truncate">{categoria}</span>
-            <span className="tabular-nums text-muted-foreground">
+            <span className="monto tabular-nums text-muted-foreground">
               {enPesos(monto)}
             </span>
           </li>

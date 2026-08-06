@@ -32,7 +32,6 @@ export function SubirResumen({
   const [texto, setTexto] = useState("");
   const [leido, setLeido] = useState<ResumenLeido | null>(null);
   const [vencimiento, setVencimiento] = useState(hoy());
-  const [titular, setTitular] = useState("propio");
   const [error, setError] = useState<string>();
   const [pendiente, iniciar] = useTransition();
 
@@ -120,8 +119,6 @@ export function SubirResumen({
               ultimos4Tarjeta={ultimos4}
               vencimiento={vencimiento}
               onVencimiento={setVencimiento}
-              titular={titular}
-              onTitular={setTitular}
             />
 
             <DialogFooter>
@@ -135,7 +132,6 @@ export function SubirResumen({
                     const r = await importarGastos(
                       tarjetaId,
                       leido.gastos,
-                      titular === "propio",
                       vencimiento,
                     );
                     if (r.error) return setError(r.error);

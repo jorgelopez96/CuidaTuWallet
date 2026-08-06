@@ -6,28 +6,17 @@ import { enPesos } from "@/lib/formato";
 import type { ResumenLeido } from "@/lib/resumen-parser";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 export function ResumenPreview({
   leido,
   ultimos4Tarjeta,
   vencimiento,
   onVencimiento,
-  titular,
-  onTitular,
 }: {
   leido: ResumenLeido;
   ultimos4Tarjeta: string;
   vencimiento: string;
   onVencimiento: (v: string) => void;
-  titular: string;
-  onTitular: (v: string) => void;
 }) {
   const { gastos, ultimos4 } = leido;
   const suma = gastos.reduce((t, g) => t + g.monto, 0);
@@ -77,33 +66,24 @@ export function ResumenPreview({
         </table>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="grid gap-2">
-          <Label htmlFor="vencimiento">Mes al que impacta</Label>
-          <Input
-            id="vencimiento"
-            type="date"
-            value={vencimiento}
-            onChange={(e) => onVencimiento(e.target.value)}
-          />
-          <p className="text-xs text-muted-foreground">
-            Vencimiento del resumen. Las fechas de arriba son de compra.
-          </p>
-        </div>
-
-        <div className="grid gap-2">
-          <Label htmlFor="titular">Titular</Label>
-          <Select value={titular} onValueChange={onTitular}>
-            <SelectTrigger id="titular">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="propio">Todos propios</SelectItem>
-              <SelectItem value="ajeno">Todos de terceros</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+      <div className="grid gap-2 sm:max-w-xs">
+        <Label htmlFor="vencimiento">Mes al que impacta</Label>
+        <Input
+          id="vencimiento"
+          type="date"
+          value={vencimiento}
+          onChange={(e) => onVencimiento(e.target.value)}
+        />
+        <p className="text-xs text-muted-foreground">
+          Vencimiento del resumen. Las fechas de arriba son de compra.
+        </p>
       </div>
+
+      <p className="text-xs text-muted-foreground">
+        Entran como propios y sin pagar: no descuentan del disponible hasta que
+        marques el resumen como pagado. En la lista de la tarjeta podés pasar a
+        terceros los que no sean tuyos.
+      </p>
     </>
   );
 }

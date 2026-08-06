@@ -16,6 +16,7 @@ type Gasto = {
   categoria: string | null;
   tarjeta_id: string | null;
   es_propio: boolean;
+  pagado: boolean;
   cuota_actual: number | null;
   cuotas_total: number | null;
 };
@@ -53,6 +54,8 @@ function leerGasto(form: FormData): { error: string } | { datos: Gasto } {
       categoria: String(form.get("categoria") ?? "").trim() || null,
       tarjeta_id,
       es_propio: form.get("es_propio") !== "ajeno",
+      // Lo que sale por crédito recién se paga cuando vence el resumen.
+      pagado: medio_pago !== "credito",
       cuota_actual,
       cuotas_total,
     },
@@ -79,11 +82,13 @@ export async function crearGasto(
  * Alta en lote desde un resumen ya revisado por el usuario en la pantalla.
  * `vencimiento` es el mes al que imputan todos: una cuota se paga cuando vence
  * el resumen, no cuando se hizo la compra.
+ *
+ * Entran todos como propios y sin pagar: quién gastó qué y si el resumen ya se
+ * pagó se corrigen después en la lista, que es donde se ve gasto por gasto.
  */
 export async function importarGastos(
   tarjetaId: string,
   gastos: GastoDetectado[],
-  esPropio: boolean,
   vencimiento: string,
 ): Promise<Resultado & { importados?: number }> {
   if (!gastos.length) return { error: "No hay gastos para importar." };
@@ -98,7 +103,8 @@ export async function importarGastos(
     medio_pago: "credito" as Medio,
     categoria: null,
     tarjeta_id: tarjetaId,
-    es_propio: esPropio,
+    es_propio: true,
+    pagado: false,
     cuota_actual: g.cuota_actual,
     cuotas_total: g.cuotas_total,
   }));
@@ -108,6 +114,41 @@ export async function importarGastos(
 
   revalidatePath("/", "layout");
   return { importados: filas.length };
+}
+
+/**
+ * Marca pagado (o impago) todo un resumen: los gastos de esa tarjeta que vencen
+ * el mismo día. Una tarjeta se paga entera, no gasto por gasto.
+ */
+export async function marcarResumenPagado(
+  tarjetaId: string,
+  vencimiento: string,
+  pagado: boolean,
+): Promise<Resultado> {
+  const { error } = await createServerSupabaseClient()
+    .from("gastos")
+    .update({ pagado })
+    .eq("tarjeta_id", tarjetaId)
+    .eq("fecha", vencimiento);
+  if (error) return { error: error.message };
+
+  revalidatePath("/", "layout");
+  return {};
+}
+
+/** Pasa un gasto de tarjeta de propio a prestado a un tercero, o al revés. */
+export async function cambiarTitular(
+  id: string,
+  esPropio: boolean,
+): Promise<Resultado> {
+  const { error } = await createServerSupabaseClient()
+    .from("gastos")
+    .update({ es_propio: esPropio })
+    .eq("id", id);
+  if (error) return { error: error.message };
+
+  revalidatePath("/", "layout");
+  return {};
 }
 
 export async function borrarGasto(id: string): Promise<Resultado> {
